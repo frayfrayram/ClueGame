@@ -1,6 +1,8 @@
 package tests;
 import java.util.Set;
 
+//Franklin Rambo, William Drescher
+
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +13,7 @@ class BoardTestsExp {
 	
 	private TestBoard board;
 
-
+// test to see if adjacency functions are set up
 	@Test
 	void testAdjacency() {
 		TestBoardCell cell = board.getCell(0,0);
@@ -21,6 +23,7 @@ class BoardTestsExp {
 		Assert.assertEquals(2,  testList.size());
 	}
 	
+// test to see if targets functions are set up
 	@Test
 	public void testTargetsNormal() {
 		TestBoardCell cell = board.getCell(0, 0);
@@ -36,6 +39,7 @@ class BoardTestsExp {
 
 	}
 	
+// tests targets on mixed board (unimplemented)
 	@Test
 	public void testTargetsMixed() {
 		board.getCell(0, 2).setOccupied(true);
