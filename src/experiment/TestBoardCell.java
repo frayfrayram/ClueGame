@@ -7,50 +7,65 @@ import java.util.Set;
 
 // Preliminary stub class just to allow for tests to pass
 public class TestBoardCell {
-	private int row;
-	private int column;
-	private Set<TestBoardCell> adjList = new HashSet<>();
+	private int row, column;
+	private boolean isRoom, isOccupied ;
+	private Set<TestBoardCell> adjList;
 	
 	public TestBoardCell(int row, int column) {
 		this.row = row;
 		this.column = column;
+		this.adjList = new HashSet<>();
 	}
 	
-	public void addAdjacency( TestBoardCell cell ) {
-		int testRow = row;
-		int testColumn = column;
-		if(((testRow - 1) >= 0) && ((testColumn - 1) >= 0)) {
-			TestBoardCell cell1 = new TestBoardCell(testRow+1, testColumn+1);
-			TestBoardCell cell2 = new TestBoardCell(testRow+1, testColumn-1);
-			TestBoardCell cell3 = new TestBoardCell(testRow-1, testColumn+1);
-			TestBoardCell cell4 = new TestBoardCell(testRow-1, testColumn-1);
-			adjList.add(cell1);
-			adjList.add(cell2);
-			adjList.add(cell3);
-			adjList.add(cell4);
-		}
-		// upper bounds not implemented, don't have boardSize variable yet
-	}
+	 private boolean checkValid(int r, int c, int numRows, int numCols) {
+	        return r >= 0 && r < numRows && c >= 0 && c < numCols;
+	    }
+	
+	
+	public void addAdjacencies(TestBoardCell[][] grid, int numRows, int numCols) {
+        adjList.clear();
+
+        // up
+        if (checkValid(row - 1, column, TestBoard.ROWS, TestBoard.COLS)) {
+            adjList.add(grid[row - 1][column]);
+        }
+
+        // down
+        if (checkValid(row + 1, column, TestBoard.ROWS, TestBoard.COLS)) {
+            adjList.add(grid[row + 1][column]);
+        }
+
+        // left
+        if (checkValid(row, column - 1, TestBoard.ROWS, TestBoard.COLS)) {
+            adjList.add(grid[row][column - 1]);
+        }
+
+        // right
+        if (checkValid(row, column + 1, TestBoard.ROWS, TestBoard.COLS)) {
+            adjList.add(grid[row][column + 1]);
+        }
+    }
+		
+	// check if top or bottom is valid, then add
 	
 	public Set<TestBoardCell> getAdjList(){
 		return adjList;
 		// just returns adjList, simple getter
-		
 	}
 	
 	public void setRoom(boolean room) {
-		
+		isRoom = room;
 	}
 	
 	public boolean isRoom() {
-		return false;
+		return isRoom;
 	}
 	
 	public void setOccupied(boolean occupied) {
-		
+		isOccupied = occupied;
 	}
 	
 	boolean getOccupied() {
-		return false;
+		return isOccupied;
 	}
 }
