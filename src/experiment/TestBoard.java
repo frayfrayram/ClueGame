@@ -34,11 +34,11 @@ public class TestBoard {
 	
 	public void findAllTargets(TestBoardCell cell, int pathlen) {
 		for(TestBoardCell adjCell : cell.getAdjList()) {
-			if(visited.contains(adjCell)) {
+			if(visited.contains(adjCell) || adjCell.getOccupied()) {
 				continue;
 			}
 			visited.add(adjCell);
-			if(pathlen == 1) {
+			if(pathlen == 1 || adjCell.isRoom()) {
 				targets.add(adjCell);
 			}else {
 				findAllTargets(adjCell, pathlen-1);

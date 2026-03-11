@@ -26,22 +26,22 @@ public class TestBoardCell {
         adjList.clear();
 
         // up
-        if (checkValid(row - 1, column, TestBoard.ROWS, TestBoard.COLS)) {
+        if (checkValid(row - 1, column, numRows, numCols)) {
             adjList.add(grid[row - 1][column]);
         }
 
         // down
-        if (checkValid(row + 1, column, TestBoard.ROWS, TestBoard.COLS)) {
+        if (checkValid(row + 1, column, numRows, numCols)) {
             adjList.add(grid[row + 1][column]);
         }
 
         // left
-        if (checkValid(row, column - 1, TestBoard.ROWS, TestBoard.COLS)) {
+        if (checkValid(row, column - 1, numRows, numCols)) {
             adjList.add(grid[row][column - 1]);
         }
 
         // right
-        if (checkValid(row, column + 1, TestBoard.ROWS, TestBoard.COLS)) {
+        if (checkValid(row, column + 1, numRows, numCols)) {
             adjList.add(grid[row][column + 1]);
         }
     }
@@ -65,7 +65,7 @@ public class TestBoardCell {
 		isOccupied = occupied;
 	}
 	
-	boolean getOccupied() {
+	public boolean getOccupied() {
 		return isOccupied;
 	}
 }
