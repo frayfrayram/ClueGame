@@ -29,6 +29,7 @@ class BoardTestsExp {
 		Assert.assertEquals(2,  testList.size());
 	}
 	
+	//oops
 // test to see if targets functions are set up
 	@Test
 	public void testTargetsNormal() {
@@ -53,7 +54,7 @@ class BoardTestsExp {
 		TestBoardCell cell = board1.getCell(0,3);
 		board1.calcTargets(cell,3);
 		Set<TestBoardCell> targets = board1.getTargets();
-		Assert.assertEquals(3,  targets.size());
+		Assert.assertEquals(3,  targets.size());      
 		Assert.assertTrue(targets.contains(board1.getCell(1,2)));
 		Assert.assertTrue(targets.contains(board1.getCell(2,2)));
 		Assert.assertTrue(targets.contains(board1.getCell(3,3)));
