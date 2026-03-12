@@ -11,6 +11,8 @@ public class TestBoard {
 	final static int COLS = 4;
 	final static int ROWS = 4;
 
+	// *****Peer review *********
+	 // missing exception handling
 
 	
 	public TestBoard() {
