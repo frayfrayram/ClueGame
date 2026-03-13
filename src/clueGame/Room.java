@@ -25,6 +25,14 @@ public class Room {
 		// TODO Auto-generated method stub
 		return centerCell;
 	}
+	
+	public void setLabelCell(BoardCell labelCell) {
+		this.labelCell = labelCell;
+	}
+
+	public void setCenterCell(BoardCell centerCell) {
+		this.centerCell = centerCell;
+	}
 
 
 }
