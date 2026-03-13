@@ -83,5 +83,13 @@ public class BoardCell {
 	public boolean isRoom() {
 		return isRoom;
 	}
+	
+	public void setOccupied(boolean occupied) {
+		isOccupied = occupied;
+	}
+	
+	public boolean getOccupied() {
+		return isOccupied;
+	}
 
 }

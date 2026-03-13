@@ -67,8 +67,13 @@ public class Board {
 			this.layoutConfigFile = layoutFile;
 			this.setupConfigFile = setupFile;
 		}
+
+	 public Set<BoardCell> getTargets(){
+			return targets;
+			// simple getter
+		}
 	 
-	 private void loadSetupConfig() {
+	 public void loadSetupConfig() {
 			roomMap.put('C', new Room("Conservatory"));
 			roomMap.put('B', new Room("Ballroom"));
 			roomMap.put('R', new Room("Billiard Room"));
@@ -82,7 +87,7 @@ public class Board {
 			roomMap.put('X', new Room("Unused"));
 		}
 	 
-	 private void loadLayoutConfig() {
+	 public void loadLayoutConfig() {
 			try {
 				Scanner scanner = new Scanner(new File(layoutConfigFile));
 
@@ -129,10 +134,6 @@ public class Board {
 				throw new RuntimeException("cannot find layout file");
 			}
 		}
-	 public Set<BoardCell> getAdjList(int i, int j) {
-		// TODO Auto-generated method stub
-		return null;
-	 }
 	 
 	 public void calcTargets(BoardCell startCell, int pathlength) {
 			visited = new HashSet<>();

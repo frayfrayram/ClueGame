@@ -34,18 +34,18 @@ public class BoardAdjTargetTest306 {
 	{
 		// we want to test a couple of different rooms.
 		// First, the study that only has a single door but a secret room
-		Set<BoardCell> testList = board.getAdjList(2, 2);
+		Set<BoardCell> testList = board.getCell(2,2).getAdjList();
 		assertEquals(2, testList.size());
 		assertTrue(testList.contains(board.getCell(4, 6)));
 		assertTrue(testList.contains(board.getCell(20, 19)));
 		
 		// now test the ballroom (note not marked since multiple test here)
-		testList = board.getAdjList(20, 11);
+		testList = board.getCell(21, 11).getAdjList();
 		assertEquals(4, testList.size());
 		assertTrue(testList.contains(board.getCell(16, 9)));
 		
 		// one more room, the kitchen
-		testList = board.getAdjList(20, 19);
+		testList = board.getCell(20,19).getAdjList();
 		assertEquals(2, testList.size());
 		assertTrue(testList.contains(board.getCell(17, 18)));
 		assertTrue(testList.contains(board.getCell(2, 2)));
@@ -57,18 +57,18 @@ public class BoardAdjTargetTest306 {
 	@Test
 	public void testAdjacencyDoor()
 	{
-		Set<BoardCell> testList = board.getAdjList(11, 1);
+		Set<BoardCell> testList = board.getCell(11, 1).getAdjList();
 		assertEquals(2, testList.size());
 		assertTrue(testList.contains(board.getCell(14, 2)));
 		assertTrue(testList.contains(board.getCell(11, 2)));
 
-		testList = board.getAdjList(19, 5);
+		testList = board.getCell(19, 5).getAdjList();
 		assertEquals(3, testList.size());
 		assertTrue(testList.contains(board.getCell(21, 2)));
 		assertTrue(testList.contains(board.getCell(18, 5)));
 		assertTrue(testList.contains(board.getCell(19, 6)));
 		
-		testList = board.getAdjList(19, 7);
+		testList = board.getCell(19, 7).getAdjList();
 		assertEquals(4, testList.size());
 		assertTrue(testList.contains(board.getCell(18, 7)));
 		assertTrue(testList.contains(board.getCell(19, 6)));
@@ -82,19 +82,19 @@ public class BoardAdjTargetTest306 {
 	public void testAdjacencyWalkways()
 	{
 		// Test on bottom edge of board, just one walkway piece
-		Set<BoardCell> testList = board.getAdjList(24, 14);
+		Set<BoardCell> testList = board.getCell(24, 14).getAdjList();
 		assertEquals(1, testList.size());
 		assertTrue(testList.contains(board.getCell(23, 14)));
 		
 		// Test near a door but not adjacent
-		testList = board.getAdjList(18, 4);
+		testList = board.getCell(18, 4).getAdjList();
 		assertEquals(3, testList.size());
 		assertTrue(testList.contains(board.getCell(18, 3)));
 		assertTrue(testList.contains(board.getCell(17, 4)));
 		assertTrue(testList.contains(board.getCell(18, 5)));
 
 		// Test adjacent to walkways
-		testList = board.getAdjList(19, 6);
+		testList = board.getCell(19, 6).getAdjList();
 		assertEquals(4, testList.size());
 		assertTrue(testList.contains(board.getCell(19, 5)));
 		assertTrue(testList.contains(board.getCell(19, 7)));
@@ -102,7 +102,7 @@ public class BoardAdjTargetTest306 {
 		assertTrue(testList.contains(board.getCell(20, 6)));
 
 		// Test next to closet
-		testList = board.getAdjList(9,14);
+		testList = board.getCell(9, 14).getAdjList();
 		assertEquals(3, testList.size());
 		assertTrue(testList.contains(board.getCell(9, 15)));
 		assertTrue(testList.contains(board.getCell(8, 14)));
