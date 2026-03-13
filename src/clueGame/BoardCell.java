@@ -67,7 +67,7 @@ public class BoardCell {
 
 	public boolean isRoomCenter() {
 		// TODO Auto-generated method stub
-		return false;
+		return roomCenter;
 	}
 
 	public char getSecretPassage() {
