@@ -1,5 +1,9 @@
 package clueGame;
 
+import java.util.Set;
+
+import experiment.TestBoardCell;
+
 public class BoardCell {
 	
 	private char initial;
@@ -7,6 +11,10 @@ public class BoardCell {
 	private boolean roomCenter;
 	private char secretPassage;
 	private DoorDirection doorDirection;
+	private Set<BoardCell> adjList;
+	private boolean isRoom, isOccupied ;
+
+
 
 	public BoardCell(String token) {
 		// TODO Auto-generated constructor stub
@@ -37,7 +45,10 @@ public class BoardCell {
 		}
 	}
 
-	
+	public Set<BoardCell> getAdjList(){
+		return adjList;
+		// just returns adjList, simple getter
+	}
 
 	public DoorDirection getDoorDirection() {
 		// TODO Auto-generated method stub
@@ -67,6 +78,10 @@ public class BoardCell {
 	public char getInitial() {
 		// TODO Auto-generated method stub
 		return initial;
+	}
+	
+	public boolean isRoom() {
+		return isRoom;
 	}
 
 }

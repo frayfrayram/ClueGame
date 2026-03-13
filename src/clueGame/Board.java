@@ -3,8 +3,12 @@ package clueGame;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+
+import experiment.TestBoardCell;
 
 public class Board {
 
@@ -18,6 +22,8 @@ public class Board {
 	private BoardCell[][] grid;
 	private int numRows;
 	private int numColumns;
+	private Set<BoardCell> targets;
+	private Set<BoardCell> visited;
 
 
      // constructor is private to ensure only one can be created
@@ -122,6 +128,34 @@ public class Board {
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException("cannot find layout file");
 			}
+		}
+	 public Set<BoardCell> getAdjList(int i, int j) {
+		// TODO Auto-generated method stub
+		return null;
+	 }
+	 
+	 public void calcTargets(BoardCell startCell, int pathlength) {
+			visited = new HashSet<>();
+			targets = new HashSet<>();
+			visited.add(startCell);
+			findAllTargets(startCell, pathlength);
+			//set visited and targets sets, then start recursive func
+		}
+	 
+	 public void findAllTargets(BoardCell cell, int pathlen) {
+			for(BoardCell adjCell : cell.getAdjList()) {
+				if(visited.contains(adjCell) || adjCell.getOccupied()) {
+					continue;
+				}
+				visited.add(adjCell);
+				if(pathlen == 1 || adjCell.isRoom()) {
+					targets.add(adjCell);
+				}else {
+					findAllTargets(adjCell, pathlen-1);
+				}
+				visited.remove(adjCell);
+			}
+			// recursive func that goes through and adds targets (basically copied from slides)
 		}
 
 }
