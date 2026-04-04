@@ -1,0 +1,13 @@
+// Rooms and room cards
+Room, Kevin Room, K
+Room, Cooking Room, C
+Room, Franklin Room, F
+Room, Drescher Room, D
+Room, Avi Room, A
+Room, Queue Room, Q
+Room, Bar, B
+Room, Shower Room, S
+Room, Garage, G
+// other spaces on board
+Space, Unused, X
+Space, Walkway, W

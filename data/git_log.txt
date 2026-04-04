@@ -1,0 +1,72 @@
+commit d49355c65df4ced55d19fc2c81e4944caa52c62b
+Author: Will Drescher <will_drescher@mines.edu>
+Date:   Tue Mar 10 23:03:40 2026 -0600
+
+    forgot to commit again but we are passing now, yeah awesomesauce
+
+commit a6bff742766c4d0103bdcf95a0d22b7e4ed61e9a
+Author: Will Drescher <will_drescher@mines.edu>
+Date:   Tue Mar 10 23:03:10 2026 -0600
+
+    stop move when next to room
+
+commit ac3462d4f821c0553a5fe0f88963a9b74b9a7d97
+Author: Will Drescher <will_drescher@mines.edu>
+Date:   Tue Mar 10 22:59:10 2026 -0600
+
+    skipping occupied cells in findalltargets
+
+commit bbf9195898317820962c4b908f383bccf84d1360
+Author: Franklin Rambo <frayfrayram@gmail.com>
+Date:   Tue Mar 10 17:44:15 2026 -0600
+
+    got first targets test to pass #imTheBest #divineIntelect
+
+commit 3ce13757956a6aa8ff482b1922b89d6c0a8e4fcc
+Merge: 7113c4b 7c74484
+Author: Franklin Rambo <frayfrayram@gmail.com>
+Date:   Tue Mar 10 16:56:55 2026 -0600
+
+    Merge branch 'main' of github.com:frayfrayram/ClueGame
+
+commit 7113c4b3dd1c0592f2f52346666a643366dc09ad
+Author: Franklin Rambo <frayfrayram@gmail.com>
+Date:   Tue Mar 10 16:55:07 2026 -0600
+
+    adjacency test now passing #awesomeSauce #divineIntelect
+
+commit 7c744845d7bac9e9971044e741782e82494726c0
+Author: Will Drescher <will_drescher@mines.edu>
+Date:   Tue Mar 10 13:26:33 2026 -0600
+
+    test file from class
+
+commit 6e920efeb6d201b546c48d9ef1692e47aee91608
+Author: Franklin Rambo <frayfrayram@gmail.com>
+Date:   Tue Mar 10 11:52:29 2026 -0600
+
+    implemented adjacency features
+
+commit 636b42aa8bc7ef5f3cbf63f2fd47ddb3328f7e7c
+Author: Franklin Rambo <frayfrayram@gmail.com>
+Date:   Fri Mar 6 15:01:28 2026 -0700
+
+    fixed my DUMB FUCK ROOMATES erros (clear errors btw)
+
+commit 4ebf4d682ea657c9f3fe1f1cb5681a2a3a2c4e2e
+Author: Will Drescher <will_drescher@mines.edu>
+Date:   Fri Mar 6 14:57:39 2026 -0700
+
+    everything is made and franklin is stupid
+
+commit 5a71811c5f77940502873f75704a880d78e9c237
+Author: Will Drescher <will_drescher@mines.edu>
+Date:   Fri Mar 6 14:41:34 2026 -0700
+
+    franklin is strange
+
+commit f36631a0099d8c17ad7292654ce4a5c4be2b536b
+Author: Franklin Rambo <frayfrayram@gmail.com>
+Date:   Fri Mar 6 14:22:59 2026 -0700
+
+    addes src and shell implementation
