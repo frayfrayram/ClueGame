@@ -21,7 +21,7 @@ public abstract class Player {
 	}
 	
 	
-	//--------getters-----------
+	//----------------------------getters---------------------
 	public Card[] getHand() {
 		return hand;
 	}

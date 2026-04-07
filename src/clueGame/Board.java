@@ -16,27 +16,32 @@ public class Board {
 	//----------------------------------------Variables--------------------------------
 	private static Board theInstance = new Board();
 	private Map<Character, Room> roomMapChar;
+	
+	//These contain the cards and use strings to access
 	private Map<String, Card> roomMap;
 	private Map<String, Card> weaponMap;
 	private Map<String, Card> playerMap;
+	
+	//files
 	private String layoutConfigFile;
 	private String setupConfigFile;
 
-
+	//board cells and board data
 	public BoardCell[][] grid;
 	private Set<BoardCell> targets;
 	private Set<BoardCell> visited;
 	public static int ROWS;
 	public static int COLS;
 	
-	
+	//sets to contain all info/data
 	private Set<Character> setupSet = new HashSet<Character>();
 	private Set<Character> configSet = new HashSet<Character>();
 	private Set<Player> playerSet = new HashSet<Player>();
 	private Set<String> weaponSet = new HashSet<String>();
-	private Set<Character> roomSet = new HashSet<Character>();
+	private Set<String> roomSet = new HashSet<String>();
 	private Set<Card> deck = new HashSet<Card>();
 	
+	//answer
 	private Card[] theAnswer;
 
 
@@ -107,7 +112,7 @@ public class Board {
 
 				if (type.equals("Room")) {
 					roomMapChar.put(symbol, new Room(name));
-					roomSet.add(symbol);
+					roomSet.add(name);
 					
 					Card card = new Card(name, CardType.ROOM);
 					
@@ -292,15 +297,18 @@ public class Board {
 		int i = 0;
 		for(Player p : playerSet) {
 			//currently goes in order and hands out cards to player, doesn't remove from deck
-			p.setHand(playerMap.get(playerSet.toArray()[i]), weaponMap.get(weaponSet.toArray()[i]), roomMap.get(roomSet.toArray()[i]));
+			p.setHand(playerMap.get(playerSet.iterator().next().getName()),
+					weaponMap.get(weaponSet.iterator().next()),
+					roomMap.get(roomSet.iterator().next()));
 			i++;
 		}
 	}
 	
 	public void getAnswer() {
-		Solution sol = new Solution(playerMap.get(playerSet.toArray()[0]),
-									weaponMap.get(weaponSet.toArray()[0]),
-									roomMap.get(roomSet.toArray()[0]));
+		//currently just sets solution to the first card of each type, need to implement random element
+		Solution sol = new Solution(playerMap.get(playerSet.iterator().next().getName()),
+									weaponMap.get(weaponSet.iterator().next()),
+									roomMap.get(roomSet.iterator().next()));
 		
 		theAnswer = sol.getAnswer();
 	}
