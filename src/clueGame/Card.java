@@ -14,6 +14,10 @@ public class Card {
 			return true;
 		} else return false;
 	}
+	
+	
+	//------------------------------getters-----------------------
+	
 	public String getName() {
 		return cardName;
 	}

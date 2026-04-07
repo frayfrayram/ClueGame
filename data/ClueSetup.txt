@@ -11,3 +11,17 @@ Room, Garage, G
 // other spaces on board
 Space, Unused, X
 Space, Walkway, W
+// People
+Person, Avi, Brown, Computer, 1, 2
+Person, Kevin, Tan, Computer, 14, 14
+Person, Drescher, Green, Computer, 0, 8
+Person, Whiteley, Black, Computer, 24, 7
+Person, Juliet, White, Computer, 7, 14
+Person, Franklin, Red, Human, 7, 0
+// Weapons
+Weapon,Wiimote
+Weapon,Beer Bottle
+Weapon,Dirty Dish
+Weapon,Golf Club
+Weapon,Car Part
+Weapon,Angry Text

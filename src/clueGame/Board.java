@@ -15,7 +15,10 @@ import experiment.TestBoardCell;
 public class Board {
 	//----------------------------------------Variables--------------------------------
 	private static Board theInstance = new Board();
-	private Map<Character, Room> roomMap;
+	private Map<Character, Room> roomMapChar;
+	private Map<String, Card> roomMap;
+	private Map<String, Card> weaponMap;
+	private Map<String, Card> playerMap;
 	private String layoutConfigFile;
 	private String setupConfigFile;
 
@@ -25,15 +28,20 @@ public class Board {
 	private Set<BoardCell> visited;
 	public static int ROWS;
 	public static int COLS;
+	
+	
 	private Set<Character> setupSet = new HashSet<Character>();
 	private Set<Character> configSet = new HashSet<Character>();
 	private Set<Player> playerSet = new HashSet<Player>();
 	private Set<String> weaponSet = new HashSet<String>();
+	private Set<Character> roomSet = new HashSet<Character>();
 	private Set<Card> deck = new HashSet<Card>();
+	
+	private Card[] theAnswer;
 
 
 	private Board() {
-		roomMap = new HashMap<>();
+		roomMapChar = new HashMap<>();
 	}
 
 	public void initialize(){
@@ -67,7 +75,9 @@ public class Board {
 						playerSet.add(new ComputerPlayer(name, color, row, col));
 					}
 					
-					deck.add(new Card(name, CardType.PLAYER));
+					Card card = new Card(name, CardType.PLAYER);
+					playerMap.put(name, card);
+					deck.add(card);
 					
 					continue;
 				}
@@ -76,8 +86,10 @@ public class Board {
 				if(line.charAt(0) == 'W') {
 					String[] parts = line.split(",");
 					weaponSet.add(parts[1]);
+					Card card =new Card(parts[1], CardType.WEAPON);
 					
-					deck.add(new Card(parts[1], CardType.WEAPON));
+					weaponMap.put(parts[1], card);
+					deck.add(card);
 				}
 
 
@@ -94,10 +106,15 @@ public class Board {
 				setupSet.add(symbol);
 
 				if (type.equals("Room")) {
-					roomMap.put(symbol, new Room(name));
-					deck.add(new Card(name, CardType.ROOM));
+					roomMapChar.put(symbol, new Room(name));
+					roomSet.add(symbol);
+					
+					Card card = new Card(name, CardType.ROOM);
+					
+					roomMap.put(name, card);
+					deck.add(card);
 				} else if (type.equals("Space")) {
-					roomMap.put(symbol, new Room(name));
+					roomMapChar.put(symbol, new Room(name));
 				}
 
 			}
@@ -157,13 +174,16 @@ public class Board {
 		} catch (FileNotFoundException e) {
 		}
 
+		//make sure files initialize
 		checkAgainstFiles();	
 
+		
+		
 		// assign label cells, center cells, and secret passages to rooms
 		for (int r = 0; r < ROWS; r++) {
 			for (int c = 0; c < COLS; c++) {
 				BoardCell currentCell = grid[r][c];
-				Room currentRoom = roomMap.get(currentCell.getInitial());
+				Room currentRoom = roomMapChar.get(currentCell.getInitial());
 
 				if (currentRoom != null) {
 					if (currentCell.isLabel()) {
@@ -217,6 +237,9 @@ public class Board {
 				grid[r][c].addAdjacencies(grid, ROWS, COLS);
 			}
 		}
+		
+		//get solution
+		getAnswer();
 	}
 
 
@@ -262,7 +285,25 @@ public class Board {
 		}
 	}
 
-
+	//-----------------------------Card functions----------------------------------
+	
+	
+	public void deal() {
+		int i = 0;
+		for(Player p : playerSet) {
+			//currently goes in order and hands out cards to player, doesn't remove from deck
+			p.setHand(playerMap.get(playerSet.toArray()[i]), weaponMap.get(weaponSet.toArray()[i]), roomMap.get(roomSet.toArray()[i]));
+			i++;
+		}
+	}
+	
+	public void getAnswer() {
+		Solution sol = new Solution(playerMap.get(playerSet.toArray()[0]),
+									weaponMap.get(weaponSet.toArray()[0]),
+									roomMap.get(roomSet.toArray()[0]));
+		
+		theAnswer = sol.getAnswer();
+	}
 
 
 	//------------------------------Getters------------------------------------
@@ -283,11 +324,11 @@ public class Board {
 		return COLS;
 	}
 	public Room getRoom(char c) {
-		return roomMap.get(c);
+		return roomMapChar.get(c);
 	}
 
 	public Room getRoom(BoardCell cell) {
-		return roomMap.get(cell.getInitial());
+		return roomMapChar.get(cell.getInitial());
 	}
 
 	public void setConfigFiles(String layoutFile, String setupFile) {
