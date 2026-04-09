@@ -18,9 +18,9 @@ public class Board {
 	private Map<Character, Room> roomMapChar;
 	
 	//These contain the cards and use strings to access
-	private Map<String, Card> roomMap;
-	private Map<String, Card> weaponMap;
-	private Map<String, Card> playerMap;
+	public Map<String, Card> roomMap;
+	public Map<String, Card> weaponMap;
+	public Map<String, Card> playerMap;
 	
 	//files
 	private String layoutConfigFile;
