@@ -6,11 +6,12 @@ public class Solution {
 	private Card ROOM;
 	private Card SOLUTION[];
 	
-	public Solution(Card p, Card w, Card r) {
+	public Solution(Card p, Card w, Card r) {		
 		this.PERSON = p;
 		this.WEAPON = w;
 		this.ROOM = r;
 		
+		SOLUTION = new Card[3];
 		SOLUTION[0] = PERSON;
 		SOLUTION[1] = WEAPON;
 		SOLUTION[2] = ROOM;

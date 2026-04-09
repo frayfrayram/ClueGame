@@ -15,9 +15,14 @@ import javax.swing.JButton;
 
 public class CardPanel extends JPanel {
 	
-	public int numHandCards;
 	
 	public CardPanel() {
+		Board board = Board.getInstance();
+		
+		int seenRoomCards = board.getRoomMap().size();
+		int seenPeopleCards = board.getPlayerMap().size();
+		int seenWeaponsCards = board.getWeaponMap().size();
+		
 		
 		JPanel cardPanel = new JPanel();
 		cardPanel.setLayout(new GridLayout(3, 0));
@@ -27,9 +32,36 @@ public class CardPanel extends JPanel {
 		// -------people cards---------
 			JPanel peoplePanel = new JPanel();
 			peoplePanel.setLayout(new GridLayout(2, 0));
-			peoplePanel.setLayout(new GridLayout(numHandCards,0));
+			peoplePanel.setBorder(new TitledBorder(new EtchedBorder(), "People"));
+			
+				JPanel seenPeople = new JPanel();
+				seenPeople.setLayout(new GridLayout(seenPeopleCards, 0));
+				
 
+			cardPanel.add(peoplePanel);
+			
+			
+		//----------room cards-------------
+			JPanel roomPanel = new JPanel();
+			roomPanel.setLayout(new GridLayout(2, 0));
+			roomPanel.setBorder(new TitledBorder(new EtchedBorder(), "Rooms"));
+			
+				JPanel seenRoom = new JPanel();
+				seenRoom.setLayout(new GridLayout(seenRoomCards, 0));
+			
+			cardPanel.add(roomPanel);
+			
+			
+			
+			
+		//------weapon cards-------------
+			JPanel weaponPanel = new JPanel();
+			weaponPanel.setLayout(new GridLayout(2, 0));
+			weaponPanel.setBorder(new TitledBorder(new EtchedBorder(), "Weapons"));
+			
 		
+
+		add(cardPanel);
 	}
 	
 	
@@ -41,7 +73,11 @@ public class CardPanel extends JPanel {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		GameControlPanel panel = new GameControlPanel();  // create the panel
+		Board board = Board.getInstance();
+		board.setConfigFiles("data/ClueLayout.csv", "data/ClueSetup.txt");
+		board.initialize();
+		
+		CardPanel panel = new CardPanel();  // create the panel
 		JFrame frame = new JFrame();  // create the frame 
 		frame.setContentPane(panel); // put the panel in the frame
 		frame.setSize(130, 550);  // size the frame

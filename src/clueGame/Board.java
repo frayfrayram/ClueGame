@@ -16,11 +16,14 @@ public class Board {
 	//----------------------------------------Variables--------------------------------
 	private static Board theInstance = new Board();
 	private Map<Character, Room> roomMapChar;
+	private Map<Character, Room> weaponMapChar;
+	private Map<Character, Room> playerMapChar;
+
 	
 	//These contain the cards and use strings to access
-	public Map<String, Card> roomMap;
-	public Map<String, Card> weaponMap;
-	public Map<String, Card> playerMap;
+	private Map<String, Card> roomMap;
+	private Map<String, Card> weaponMap;
+	private Map<String, Card> playerMap;
 	
 	//files
 	private String layoutConfigFile;
@@ -45,8 +48,13 @@ public class Board {
 	private Card[] theAnswer;
 
 
-	private Board() {
+	private  Board() {
 		roomMapChar = new HashMap<>();
+		weaponMapChar = new HashMap<>();
+		playerMapChar = new HashMap<>();
+		roomMap = new HashMap<>();
+		weaponMap = new HashMap<>();
+		playerMap = new HashMap<>();
 	}
 
 	public void initialize(){
@@ -73,10 +81,10 @@ public class Board {
 					String type = parts[3].trim();
 					int row = Integer.parseInt(parts[4].trim());
 					int col = Integer.parseInt(parts[5].trim());
-					if(type == "Human") {
+					if(type.equals("Human")) {
 						playerSet.add(new HumanPlayer(name, color, row, col));
 					} 
-					if(type == "Computer") {
+					if(type.equals("Computer")) {
 						playerSet.add(new ComputerPlayer(name, color, row, col));
 					}
 					
@@ -88,13 +96,16 @@ public class Board {
 				}
 				
 				// weapon handling
-				if(line.charAt(0) == 'W') {
+				if (line.charAt(0) == 'W') {
 					String[] parts = line.split(",");
-					weaponSet.add(parts[1]);
-					Card card =new Card(parts[1], CardType.WEAPON);
-					
-					weaponMap.put(parts[1], card);
+					String weaponName = parts[1].trim();
+					weaponSet.add(weaponName);
+
+					Card card = new Card(weaponName, CardType.WEAPON);
+					weaponMap.put(weaponName, card);
 					deck.add(card);
+
+					continue;
 				}
 
 
@@ -116,7 +127,7 @@ public class Board {
 					
 					Card card = new Card(name, CardType.ROOM);
 					
-					roomMap.put(name, card);
+					getRoomMap().put(name, card);
 					deck.add(card);
 				} else if (type.equals("Space")) {
 					roomMapChar.put(symbol, new Room(name));
@@ -124,6 +135,7 @@ public class Board {
 
 			}
 		} catch (FileNotFoundException e) {
+			throw new RuntimeException("could not find file: " + setupConfigFile, e);
 		}
 	}
 
@@ -152,6 +164,7 @@ public class Board {
 				ROWS++;
 			}
 		} catch (FileNotFoundException e) {
+			throw new RuntimeException("could not find file: " + setupConfigFile, e);
 		}
 
 		try (Scanner scanner = new Scanner(new File(layoutConfigFile))) {
@@ -299,7 +312,7 @@ public class Board {
 			//currently goes in order and hands out cards to player, doesn't remove from deck
 			p.setHand(playerMap.get(playerSet.iterator().next().getName()),
 					weaponMap.get(weaponSet.iterator().next()),
-					roomMap.get(roomSet.iterator().next()));
+					getRoomMap().get(roomSet.iterator().next()));
 			i++;
 		}
 	}
@@ -308,7 +321,7 @@ public class Board {
 		//currently just sets solution to the first card of each type, need to implement random element
 		Solution sol = new Solution(playerMap.get(playerSet.iterator().next().getName()),
 									weaponMap.get(weaponSet.iterator().next()),
-									roomMap.get(roomSet.iterator().next()));
+									getRoomMap().get(roomSet.iterator().next()));
 		
 		theAnswer = sol.getAnswer();
 	}
@@ -346,6 +359,22 @@ public class Board {
 
 	public Set<BoardCell> getTargets(){
 		return targets;
+	}
+
+	public Map<String, Card> getRoomMap() {
+		return roomMap;
+	}
+	
+	public Map<String, Card> getPlayerMap() {
+		return playerMap;
+	}
+	
+	public Map<String, Card> getWeaponMap() {
+		return weaponMap;
+	}
+
+	public void setRoomMap(Map<String, Card> roomMap) {
+		this.roomMap = roomMap;
 	}
 
 }
