@@ -21,7 +21,7 @@ public class Board {
 	//These contain the cards and use strings to access
 	private Map<String, Card> roomMap;
 	private Map<String, Card> weaponMap;
-	private Map<String, Card> playerMap;
+	private Map<String, Player> playerMap;
 	private Map<String, Card> cardMap;
 	
 	//files
@@ -39,12 +39,14 @@ public class Board {
 	private Set<Character> setupSet = new HashSet<Character>();
 	private Set<Character> configSet = new HashSet<Character>();
 	private Set<Player> playerSet = new HashSet<Player>();
+	private Set<String> playerNameSet = new HashSet<String>();
 	private Set<String> weaponSet = new HashSet<String>();
 	private Set<String> roomSet = new HashSet<String>();
 	private Set<Card> deck = new HashSet<Card>();
+	Set<Card> tempSol = new HashSet<>();
 	
 	//answer
-	private Card[] theAnswer;
+	private Solution theAnswer;
 
 
 	private  Board() {
@@ -68,7 +70,7 @@ public class Board {
 	    weaponSet.clear();
 	    roomSet.clear();
 	    deck.clear();
-
+	    
 	    targets = new HashSet<>();
 	    visited = new HashSet<>();
 
@@ -96,14 +98,21 @@ public class Board {
 					int row = Integer.parseInt(parts[4].trim());
 					int col = Integer.parseInt(parts[5].trim());
 					if(type.equals("Human")) {
-						playerSet.add(new HumanPlayer(name, color, row, col));
+						Player player = new HumanPlayer(name, color, row, col);
+						playerSet.add(player);
+						playerNameSet.add(name);
+						playerMap.put(name, player);
 					} 
 					if(type.equals("Computer")) {
-						playerSet.add(new ComputerPlayer(name, color, row, col));
+						Player player = new ComputerPlayer(name, color, row, col);
+						playerSet.add(player);
+						playerNameSet.add(name);
+						playerMap.put(name, player);
 					}
 					
+					
 					Card card = new Card(name, CardType.PLAYER);
-					playerMap.put(name, card);
+
 					cardMap.put(name, card);
 					deck.add(card);
 					
@@ -271,9 +280,7 @@ public class Board {
 				grid[r][c].addAdjacencies(grid, ROWS, COLS);
 			}
 		}
-		
-		//get solution
-	//	getAnswer();
+		setAnswer();
 	}
 
 
@@ -324,24 +331,49 @@ public class Board {
 	
 	public void deal() {
 		int i = 0;
-		for(Player p : playerSet) {
-			//currently goes in order and hands out cards to player, doesn't remove from deck
-			p.setHand(playerMap.get(playerSet.iterator().next().getName()),
-					weaponMap.get(weaponSet.iterator().next()),
-					getRoomMap().get(roomSet.iterator().next()));
+		for(Card c : deck) {
+			switch(i%6){
+				case 0:
+					playerMap.get("Franklin").setHand(c);
+					break;
+				case 1:
+					playerMap.get("Avi").setHand(c);
+					break;
+				case 2:
+					playerMap.get("Kevin").setHand(c);
+					break;
+				case 3:
+					playerMap.get("Drescher").setHand(c);
+					break;
+				case 4:
+					playerMap.get("Whiteley").setHand(c);
+					break;
+				case 5:
+					playerMap.get("Juliet").setHand(c);
+					break;
+			}
 			i++;
 		}
+		deck.clear();
 	}
 	
-	public void getAnswer() {
+	private void setAnswer() {
 		//currently just sets solution to the first card of each type, need to implement random element
-		Solution sol = new Solution(playerMap.get(playerSet.iterator().next().getName()),
-									weaponMap.get(weaponSet.iterator().next()),
-									getRoomMap().get(roomSet.iterator().next()));
-		
-		theAnswer = sol.getAnswer();
+		theAnswer = new Solution(cardMap.get("Kevin"), cardMap.get("Wiimote"), cardMap.get("Bar"));
 	}
 
+	public boolean checkAnswer(Card p, Card w, Card r) {
+		tempSol.add(p);
+		tempSol.add(w);
+		tempSol.add(r);
+		if(theAnswer.getAnswer().equals(tempSol)) {
+			tempSol.clear();
+			return true;
+		} else {
+			tempSol.clear();
+			return false;
+		}
+	}
 
 	//------------------------------Getters------------------------------------
 
@@ -354,6 +386,14 @@ public class Board {
 	
 	public Card getCard(String name) {
 		return cardMap.get(name);
+	}
+	
+	public Player getPlayer(String name) {
+		return playerMap.get(name);
+	}
+	
+	public Solution getAnswer() {
+		return theAnswer;
 	}
 	
 	public BoardCell getCell(int row, int column) {
@@ -387,7 +427,7 @@ public class Board {
 		return roomMap;
 	}
 	
-	public Map<String, Card> getPlayerMap() {
+	public Map<String, Player> getPlayerMap() {
 		return playerMap;
 	}
 	

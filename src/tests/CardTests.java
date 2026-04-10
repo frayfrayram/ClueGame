@@ -17,6 +17,7 @@ import clueGame.BadConfigFormatException;
 import clueGame.Board;
 import clueGame.BoardCell;
 import clueGame.Card;
+import clueGame.Solution;
 
 public class CardTests {
 	private static Board board;
@@ -32,8 +33,8 @@ public class CardTests {
 
 	@Test
 	public void testDeckSize(){
-		Set<Card> testList = board.getDeck();
-		assertEquals(21, testList.size());
+		Set<Card> testDeck = board.getDeck();
+		assertEquals(21, testDeck.size());
 	}
 	
 	@Test
@@ -45,5 +46,22 @@ public class CardTests {
 		// one card of each type
 	}
 	
+	@Test
+	public void testSolution() {
+		assertTrue(board.checkAnswer(board.getCard("Kevin"),
+								   	board.getCard("Wiimote"),
+									board.getCard("Bar")));
+	}
 	
+	@Test
+	public void testDeal() {
+		board.deal();
+		Set<Card> testDeck = board.getDeck();
+		assertEquals(0, testDeck.size());
+		assertEquals(4, board.getPlayer("Franklin").getHand().size());
+		assertEquals(4, board.getPlayer("Kevin").getHand().size());
+		assertEquals(3, board.getPlayer("Juliet").getHand().size());
+	}
+
+
 }

@@ -1,23 +1,26 @@
 package clueGame;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Solution {
-	private Card PERSON;
-	private Card WEAPON;
-	private Card ROOM;
-	private Card SOLUTION[];
+	private Card person;
+	private Card weapon;
+	private Card room;
+	private Set<Card> solution;
 	
 	public Solution(Card p, Card w, Card r) {		
-		this.PERSON = p;
-		this.WEAPON = w;
-		this.ROOM = r;
-		
-		SOLUTION = new Card[3];
-		SOLUTION[0] = PERSON;
-		SOLUTION[1] = WEAPON;
-		SOLUTION[2] = ROOM;
+		this.person = p;
+		this.weapon = w;
+		this.room = r;
+		solution = new HashSet<>();
 	}
 	
-	public Card[] getAnswer() {
-		return SOLUTION;
+	public Set<Card> getAnswer() {
+
+		solution.add(person);
+		solution.add(weapon);
+		solution.add(room);
+		return solution;
 	}
 }
