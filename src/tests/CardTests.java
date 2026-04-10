@@ -24,14 +24,26 @@ public class CardTests {
 	@BeforeEach
 	public void setUp() {
 		board = Board.getInstance();
-		board.setConfigFiles("data/ClueLayout.csv", "data/ClueSetup.txt");		
+		// set the file names to use my config files
+		board.setConfigFiles("data/ClueLayout.csv", "data/ClueSetup.txt");
+		// Initialize will load BOTH config files
 		board.initialize();
 	}
 
 	@Test
-	public void testDeckSize()
-	{
+	public void testDeckSize(){
 		Set<Card> testList = board.getDeck();
 		assertEquals(21, testList.size());
 	}
+	
+	@Test
+	public void testDeck() {
+		Set<Card> testDeck = board.getDeck();
+		assertTrue(testDeck.contains(board.getCard("Wiimote")));
+		assertTrue(testDeck.contains(board.getCard("Franklin")));
+		assertTrue(testDeck.contains(board.getCard("Franklin Room")));
+		// one card of each type
+	}
+	
+	
 }

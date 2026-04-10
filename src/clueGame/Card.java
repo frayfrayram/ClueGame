@@ -17,7 +17,6 @@ public class Card {
 	
 	
 	//------------------------------getters-----------------------
-	
 	public String getName() {
 		return cardName;
 	}

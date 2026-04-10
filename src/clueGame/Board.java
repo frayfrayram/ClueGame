@@ -16,14 +16,13 @@ public class Board {
 	//----------------------------------------Variables--------------------------------
 	private static Board theInstance = new Board();
 	private Map<Character, Room> roomMapChar;
-	private Map<Character, Room> weaponMapChar;
-	private Map<Character, Room> playerMapChar;
 
 	
 	//These contain the cards and use strings to access
 	private Map<String, Card> roomMap;
 	private Map<String, Card> weaponMap;
 	private Map<String, Card> playerMap;
+	private Map<String, Card> cardMap;
 	
 	//files
 	private String layoutConfigFile;
@@ -50,16 +49,31 @@ public class Board {
 
 	private  Board() {
 		roomMapChar = new HashMap<>();
-		weaponMapChar = new HashMap<>();
-		playerMapChar = new HashMap<>();
 		roomMap = new HashMap<>();
 		weaponMap = new HashMap<>();
 		playerMap = new HashMap<>();
+		cardMap = new HashMap<>();
 	}
 
 	public void initialize(){
-		loadSetupConfig();
-		loadLayoutConfig();
+	    roomMapChar.clear();
+	    roomMap.clear();
+	    weaponMap.clear();
+	    playerMap.clear();
+	    cardMap.clear();
+
+	    setupSet.clear();
+	    configSet.clear();
+	    playerSet.clear();
+	    weaponSet.clear();
+	    roomSet.clear();
+	    deck.clear();
+
+	    targets = new HashSet<>();
+	    visited = new HashSet<>();
+
+	    loadSetupConfig();
+	    loadLayoutConfig();
 	}
 
 	//---------------------------Load_Config_Files-------------------------------------------
@@ -90,6 +104,7 @@ public class Board {
 					
 					Card card = new Card(name, CardType.PLAYER);
 					playerMap.put(name, card);
+					cardMap.put(name, card);
 					deck.add(card);
 					
 					continue;
@@ -103,13 +118,14 @@ public class Board {
 
 					Card card = new Card(weaponName, CardType.WEAPON);
 					weaponMap.put(weaponName, card);
+					cardMap.put(weaponName, card);
 					deck.add(card);
 
 					continue;
 				}
 
 
-
+				// handle rooms
 				String[] parts = line.split(",");
 				if (parts.length < 3) {
 					throw new BadConfigFormatException("Bad configuration file");
@@ -127,8 +143,8 @@ public class Board {
 					
 					Card card = new Card(name, CardType.ROOM);
 					
-					getRoomMap().put(name, card);
 					deck.add(card);
+					cardMap.put(name, card);
 				} else if (type.equals("Space")) {
 					roomMapChar.put(symbol, new Room(name));
 				}
@@ -257,7 +273,7 @@ public class Board {
 		}
 		
 		//get solution
-		getAnswer();
+	//	getAnswer();
 	}
 
 
@@ -335,9 +351,15 @@ public class Board {
 	public Set<Card> getDeck(){
 		return deck;
 	}
+	
+	public Card getCard(String name) {
+		return cardMap.get(name);
+	}
+	
 	public BoardCell getCell(int row, int column) {
 		return grid[row][column];
 	}
+
 	public int getNumRows() {
 		return ROWS;
 	}
