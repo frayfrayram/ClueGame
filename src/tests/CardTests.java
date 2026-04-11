@@ -48,7 +48,8 @@ public class CardTests {
 	
 	@Test
 	public void testSolution() {
-		assertTrue(board.checkAnswer(board.getCard("Kevin"),
+		board.setSolution("Kevin", "Wiimote", "Bar");
+		assertTrue(board.checkAccusation(board.getCard("Kevin"),
 								   	board.getCard("Wiimote"),
 									board.getCard("Bar")));
 	}

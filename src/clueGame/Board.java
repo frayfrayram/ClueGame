@@ -280,7 +280,6 @@ public class Board {
 				grid[r][c].addAdjacencies(grid, ROWS, COLS);
 			}
 		}
-		setAnswer();
 	}
 
 
@@ -334,22 +333,22 @@ public class Board {
 		for(Card c : deck) {
 			switch(i%6){
 				case 0:
-					playerMap.get("Franklin").setHand(c);
+					playerMap.get("Franklin").updateHand(c);
 					break;
 				case 1:
-					playerMap.get("Avi").setHand(c);
+					playerMap.get("Avi").updateHand(c);
 					break;
 				case 2:
-					playerMap.get("Kevin").setHand(c);
+					playerMap.get("Kevin").updateHand(c);
 					break;
 				case 3:
-					playerMap.get("Drescher").setHand(c);
+					playerMap.get("Drescher").updateHand(c);
 					break;
 				case 4:
-					playerMap.get("Whiteley").setHand(c);
+					playerMap.get("Whiteley").updateHand(c);
 					break;
 				case 5:
-					playerMap.get("Juliet").setHand(c);
+					playerMap.get("Juliet").updateHand(c);
 					break;
 			}
 			i++;
@@ -357,12 +356,12 @@ public class Board {
 		deck.clear();
 	}
 	
-	private void setAnswer() {
+	public void setSolution(String player, String weapon, String room) {
 		//currently just sets solution to the first card of each type, need to implement random element
-		theAnswer = new Solution(cardMap.get("Kevin"), cardMap.get("Wiimote"), cardMap.get("Bar"));
+		theAnswer = new Solution(cardMap.get(player), cardMap.get(weapon), cardMap.get(room));
 	}
 
-	public boolean checkAnswer(Card p, Card w, Card r) {
+	public boolean checkAccusation(Card p, Card w, Card r) {
 		tempSol.add(p);
 		tempSol.add(w);
 		tempSol.add(r);
@@ -373,6 +372,19 @@ public class Board {
 			tempSol.clear();
 			return false;
 		}
+	}
+	
+	public Card handleSuggestion(Card p, Card w, Card r, Player play) {
+		for(Player player : playerSet) {
+			if(player == play) {
+				continue;
+			}
+			Card c = player.disproveSuggestion(p, w, r);
+			if(c != null) {
+				return c;
+			}
+		}
+		return null;
 	}
 
 	//------------------------------Getters------------------------------------
@@ -435,6 +447,10 @@ public class Board {
 		return weaponMap;
 	}
 
+	public Map<Character, Room> getRoomMapChar(){
+		return roomMapChar;
+	}
+	
 	public void setRoomMap(Map<String, Card> roomMap) {
 		this.roomMap = roomMap;
 	}
