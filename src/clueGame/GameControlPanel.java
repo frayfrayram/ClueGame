@@ -8,12 +8,15 @@ import javax.swing.border.TitledBorder;
 import javax.swing.JLabel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 
 import javax.swing.JButton;
 
 
 public class GameControlPanel extends JPanel {
+	
+	private String player = "Avi";
 
 	/**
 	 * Constructor for the panel, it does 90% of the work
@@ -35,7 +38,8 @@ public class GameControlPanel extends JPanel {
 				
 				
 					JLabel turnLabel = new JLabel("        Whose turn?");
-					JTextField turnText = new JTextField();
+					JTextField turnText = new JTextField(player);
+					turnText.setBackground(Color.YELLOW);
 					
 					turnPanel.add(turnLabel);
 					turnPanel.add(turnText);
@@ -104,6 +108,10 @@ public class GameControlPanel extends JPanel {
 		
 	}
 	
+	
+	public void setPlayer(String player) {
+		
+	}
 	
 	/**
 	 * Main to test the panel
