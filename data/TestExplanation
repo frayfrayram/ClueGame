@@ -1,0 +1,3 @@
+We wrote our tests that specifically tested each aspect of our pathfinding algorithm, making it leave out rooms and 
+show that it can see and use secret passageways. As well as making sure it correctly assigns doors to their rooms 
+and is able to detect doors as possible landing locations.
