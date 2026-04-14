@@ -110,7 +110,7 @@ public class GameControlPanel extends JPanel {
 	
 	
 	public void setPlayer(String player) {
-		
+		this.player = player;
 	}
 	
 	/**

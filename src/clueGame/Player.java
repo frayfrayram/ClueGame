@@ -20,6 +20,7 @@ public abstract class Player {
 		this.row = row;
 		this.col = col;
 		hand = new ArrayList<>();
+		seen = new HashSet<>();
 	}
 	
 	public void updateHand(Card card) {
@@ -28,6 +29,10 @@ public abstract class Player {
 	
 	public void updateSeen(Card seenCard) {
 		seen.add(seenCard);
+	}
+	
+	public Set<Card> getSeen() {
+		return seen;
 	}
 	
 	public Card disproveSuggestion(Card p, Card w, Card r) {

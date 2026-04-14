@@ -9,19 +9,64 @@ import javax.swing.JLabel;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.Set;
 
 import javax.swing.JButton;
 
 
 public class CardPanel extends JPanel {
 	
+	private int numSeenRoomCards;
+	private int numSeenWeaponCards;
+	private int numSeenPlayerCards;
+	
+	private int numHandRoomCards;
+	private int numHandWeaponCards;
+	private int numHandPlayerCards;
+	
+	
 	
 	public CardPanel() {
 		Board board = Board.getInstance();
 		
-		int seenRoomCards = board.getRoomMap().size();
-		int seenPeopleCards = board.getPlayerMap().size();
-		int seenWeaponsCards = board.getWeaponMap().size();
+		Player player1 = board.getPlayer("Franklin");
+		Player player2 = board.getPlayer("Kevin");
+		Player player3 = board.getPlayer("Drescher");
+		Player player4 = board.getPlayer("Whiteley");
+		Player player5 = board.getPlayer("Juliet");
+		Player player6 = board.getPlayer("Avi");
+		
+		
+		Set<Card> seen = player1.getSeen();
+		ArrayList<Card> hand = player1.getHand();
+
+		
+		
+		for (Card card : hand) {
+			if (card.getType() == CardType.ROOM) {
+				numHandRoomCards++;
+			} else if (card.getType() == CardType.PLAYER) {
+				numHandPlayerCards++;
+			} else if (card.getType() == CardType.WEAPON) {
+				numHandWeaponCards++;
+			}
+		}
+
+		for (Card card : seen) {
+			if (hand.contains(card)) {
+				continue;
+			}
+
+			if (card.getType() == CardType.ROOM) {
+				numSeenRoomCards++;
+			} else if (card.getType() == CardType.PLAYER) {
+				numSeenPlayerCards++;
+			} else if (card.getType() == CardType.WEAPON) {
+				numSeenWeaponCards++;
+			}
+		}
+
 		
 		
 		JPanel cardPanel = new JPanel();
@@ -35,7 +80,7 @@ public class CardPanel extends JPanel {
 			peoplePanel.setBorder(new TitledBorder(new EtchedBorder(), "People"));
 			
 				JPanel handPeople = new JPanel();
-				handPeople.setLayout(new GridLayout(2,0));
+				handPeople.setLayout(new GridLayout(numHandPlayerCards,1));
 				JTextField hPeople = new JTextField("None", 12);
 				JLabel handPeopleLabel = new JLabel("In Hand");
 				
@@ -47,7 +92,7 @@ public class CardPanel extends JPanel {
 				
 			
 				JPanel seenPeople = new JPanel();
-				seenPeople.setLayout(new GridLayout(2,0));
+				seenPeople.setLayout(new GridLayout(numSeenPlayerCards,1));
 				JTextField sPeople = new JTextField("None", 12);
 				JLabel seenPeopleLabel = new JLabel("Seen");
 				
@@ -64,7 +109,7 @@ public class CardPanel extends JPanel {
 			roomPanel.setBorder(new TitledBorder(new EtchedBorder(), "Rooms"));
 			
 			JPanel handRooms = new JPanel();
-			handRooms.setLayout(new GridLayout(2,0));
+			handRooms.setLayout(new GridLayout(numHandRoomCards,1));
 			JTextField hRooms = new JTextField("None", 12);
 			JLabel handRoomsLabel = new JLabel("In Hand");
 			
@@ -76,7 +121,7 @@ public class CardPanel extends JPanel {
 			
 		
 			JPanel seenRooms = new JPanel();
-			seenRooms.setLayout(new GridLayout(2,0));
+			seenRooms.setLayout(new GridLayout(numSeenRoomCards,1));
 			JTextField sRooms = new JTextField("None", 12);
 			JLabel seenRoomsLabel = new JLabel("Seen");
 			
@@ -95,7 +140,7 @@ public class CardPanel extends JPanel {
 			weaponPanel.setBorder(new TitledBorder(new EtchedBorder(), "Weapons"));
 			
 			JPanel handWeapon = new JPanel();
-			handWeapon.setLayout(new GridLayout(2,0));
+			handWeapon.setLayout(new GridLayout(numHandWeaponCards,1));
 			JTextField hWeapon = new JTextField("None", 12);
 			JLabel handWeaponLabel = new JLabel("In Hand");
 			
@@ -107,7 +152,7 @@ public class CardPanel extends JPanel {
 			
 		
 			JPanel seenWeapon = new JPanel();
-			seenWeapon.setLayout(new GridLayout(2,0));
+			seenWeapon.setLayout(new GridLayout(numSeenWeaponCards,1));
 			JTextField sWeapon = new JTextField("None", 12);
 			JLabel seenWeaponLabel = new JLabel("Seen");
 			
@@ -136,6 +181,7 @@ public class CardPanel extends JPanel {
 		board.setConfigFiles("data/ClueLayout.csv", "data/ClueSetup.txt");
 		board.initialize();
 		
+
 		CardPanel panel = new CardPanel();  // create the panel
 		JFrame frame = new JFrame();  // create the frame 
 		frame.setContentPane(panel); // put the panel in the frame

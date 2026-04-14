@@ -76,6 +76,7 @@ public class Board {
 
 	    loadSetupConfig();
 	    loadLayoutConfig();
+	    deal();
 	}
 
 	//---------------------------Load_Config_Files-------------------------------------------
