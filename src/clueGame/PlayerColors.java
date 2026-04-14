@@ -7,8 +7,8 @@ public enum PlayerColors {
 	GREEN(Color.GREEN),
 	BLUE(Color.BLUE),
 	YELLOW(Color.YELLOW),
-	WHITE(Color.WHITE),
-	BLACK(Color.BLACK);
+	MAGENTA(Color.MAGENTA),
+	CYAN(Color.CYAN);
 
 	private Color awtColor;
 
