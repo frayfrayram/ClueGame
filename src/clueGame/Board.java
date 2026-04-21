@@ -5,10 +5,13 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.IntStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import experiment.TestBoardCell;
 
@@ -38,11 +41,11 @@ public class Board {
 	//sets to contain all info/data
 	private Set<Character> setupSet = new HashSet<Character>();
 	private Set<Character> configSet = new HashSet<Character>();
-	private Set<Player> playerSet = new HashSet<Player>();
+	private ArrayList<Player> players = new ArrayList<>();
 	private Set<String> playerNameSet = new HashSet<String>();
 	private Set<String> weaponSet = new HashSet<String>();
 	private Set<String> roomSet = new HashSet<String>();
-	private Set<Card> deck = new HashSet<Card>();
+	private ArrayList<Card> deck = new ArrayList<Card>();
 	Set<Card> tempSol = new HashSet<>();
 	
 	//answer
@@ -66,7 +69,7 @@ public class Board {
 
 	    setupSet.clear();
 	    configSet.clear();
-	    playerSet.clear();
+	    players.clear();
 	    weaponSet.clear();
 	    roomSet.clear();
 	    deck.clear();
@@ -76,7 +79,6 @@ public class Board {
 
 	    loadSetupConfig();
 	    loadLayoutConfig();
-	    deal();
 	}
 
 	//---------------------------Load_Config_Files-------------------------------------------
@@ -100,13 +102,13 @@ public class Board {
 					int col = Integer.parseInt(parts[5].trim());
 					if(type.equals("Human")) {
 						Player player = new HumanPlayer(name, color, row, col);
-						playerSet.add(player);
+						players.add(player);
 						playerNameSet.add(name);
 						playerMap.put(name, player);
 					} 
 					if(type.equals("Computer")) {
 						Player player = new ComputerPlayer(name, color, row, col);
-						playerSet.add(player);
+						players.add(player);
 						playerNameSet.add(name);
 						playerMap.put(name, player);
 					}
@@ -330,31 +332,52 @@ public class Board {
 	
 	
 	public void deal() {
-		int i = 0;
-		for(Card c : deck) {
-			switch(i%6){
-				case 0:
-					playerMap.get("Franklin").updateHand(c);
-					break;
-				case 1:
-					playerMap.get("Avi").updateHand(c);
-					break;
-				case 2:
-					playerMap.get("Kevin").updateHand(c);
-					break;
-				case 3:
-					playerMap.get("Drescher").updateHand(c);
-					break;
-				case 4:
-					playerMap.get("Whiteley").updateHand(c);
-					break;
-				case 5:
-					playerMap.get("Juliet").updateHand(c);
-					break;
-			}
-			i++;
-		}
-		deck.clear();
+	    ArrayList<Card> rooms = new ArrayList<>();
+	    ArrayList<Card> people = new ArrayList<>();
+	    ArrayList<Card> weapons = new ArrayList<>();
+	    ArrayList<Card> remainingCards = new ArrayList<>();
+
+	    Random rand = new Random();
+
+	    // Separate cards by type
+	    for (Card c : deck) {
+	        if (c.getType() == CardType.ROOM) {
+	            rooms.add(c);
+	        } 
+	        else if (c.getType() == CardType.PLAYER) {
+	            people.add(c);
+	        } 
+	        else if (c.getType() == CardType.WEAPON) {
+	            weapons.add(c);
+	        }
+	    }
+
+	    // Pick one of each type for the answer
+	    Card roomAnswer = rooms.remove(rand.nextInt(rooms.size()));
+	    Card personAnswer = people.remove(rand.nextInt(people.size()));
+	    Card weaponAnswer = weapons.remove(rand.nextInt(weapons.size()));
+
+	    theAnswer = new Solution(roomAnswer, personAnswer, weaponAnswer);
+
+	    // Build list of cards to actually deal
+	    remainingCards.addAll(rooms);
+	    remainingCards.addAll(people);
+	    remainingCards.addAll(weapons);
+
+	    // Shuffle remaining cards
+	    Collections.shuffle(remainingCards);
+
+	    // Clear players' hands first if needed
+	    for (Player p : players) {
+	        p.getHand().clear();
+	    }
+
+	    // Deal cards round-robin
+	    int playerIndex = 0;
+	    for (Card c : remainingCards) {
+	        players.get(playerIndex).updateHand(c);
+	        playerIndex = (playerIndex + 1) % players.size();
+	    }
 	}
 	
 	public void setSolution(String player, String weapon, String room) {
@@ -376,7 +399,7 @@ public class Board {
 	}
 	
 	public Card handleSuggestion(Card p, Card w, Card r, Player play) {
-		for(Player player : playerSet) {
+		for(Player player : players) {
 			if(player == play) {
 				continue;
 			}
@@ -393,7 +416,7 @@ public class Board {
 	public static Board getInstance() {
 		return theInstance;
 	}
-	public Set<Card> getDeck(){
+	public ArrayList<Card> getDeck(){
 		return deck;
 	}
 	

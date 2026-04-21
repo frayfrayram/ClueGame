@@ -56,6 +56,13 @@ public abstract class Player {
 	}
 	
 	
+	// way to move player
+	public void setLocation(int row, int col) {
+	    this.row = row;
+	    this.col = col;
+	}
+	
+	
 	//----------------------------getters---------------------
 	public ArrayList<Card> getHand() {
 		return hand;

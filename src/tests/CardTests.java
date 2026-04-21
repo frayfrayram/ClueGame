@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -33,13 +34,13 @@ public class CardTests {
 
 	@Test
 	public void testDeckSize(){
-		Set<Card> testDeck = board.getDeck();
+		ArrayList<Card> testDeck = board.getDeck();
 		assertEquals(21, testDeck.size());
 	}
 	
 	@Test
 	public void testDeck() {
-		Set<Card> testDeck = board.getDeck();
+		ArrayList<Card> testDeck = board.getDeck();
 		assertTrue(testDeck.contains(board.getCard("Wiimote")));
 		assertTrue(testDeck.contains(board.getCard("Franklin")));
 		assertTrue(testDeck.contains(board.getCard("Franklin Room")));
@@ -57,10 +58,10 @@ public class CardTests {
 	@Test
 	public void testDeal() {
 		board.deal();
-		Set<Card> testDeck = board.getDeck();
-		assertEquals(0, testDeck.size());
-		assertEquals(4, board.getPlayer("Franklin").getHand().size());
-		assertEquals(4, board.getPlayer("Kevin").getHand().size());
+		ArrayList<Card> testDeck = board.getDeck();
+		assertEquals(21, testDeck.size());
+		assertEquals(3, board.getPlayer("Franklin").getHand().size());
+		assertEquals(3, board.getPlayer("Kevin").getHand().size());
 		assertEquals(3, board.getPlayer("Juliet").getHand().size());
 	}
 

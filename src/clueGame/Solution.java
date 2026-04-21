@@ -23,4 +23,16 @@ public class Solution {
 		solution.add(room);
 		return solution;
 	}
+
+	public Card getRoom() {
+		return room;
+	}
+	
+	public Card getWeapon() {
+		return weapon;
+	}
+	
+	public Card getPerson() {
+		return person;
+	}
 }

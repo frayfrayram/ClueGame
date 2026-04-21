@@ -9,10 +9,19 @@ public class Card {
 		this.cardType = type;
 	}
 	
-	public boolean equals(Card target) {
-		if((cardName == target.getName()) && (cardType == target.getType())) {
-			return true;
-		} else return false;
+	@Override
+	public boolean equals(Object obj) {
+	    if (this == obj) return true;
+	    if (obj == null || getClass() != obj.getClass()) return false;
+
+	    // had to look this up
+	    Card other = (Card) obj;
+	    return cardName.equals(other.cardName) && cardType == other.cardType;
+	}
+
+	@Override
+	public int hashCode() {
+	    return java.util.Objects.hash(cardName, cardType);
 	}
 	
 	
