@@ -1,5 +1,7 @@
 package clueGame;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashSet;
@@ -178,6 +180,38 @@ public class BoardCell {
 				}
 			}
 			}		
+	 
+	 public void draw(Graphics g, int cellWidth, int cellHeight) {
+			int x = column * cellWidth;
+			int y = row * cellHeight;
+
+			if (initial == 'W') {
+				g.setColor(Color.YELLOW);
+				g.fillRect(x, y, cellWidth, cellHeight);
+				g.setColor(Color.BLACK);
+				g.drawRect(x, y, cellWidth, cellHeight);
+			} else if (initial == 'X') {
+				g.setColor(Color.BLACK);
+				g.fillRect(x, y, cellWidth, cellHeight);
+			} else {
+				g.setColor(Color.LIGHT_GRAY);
+				g.fillRect(x, y, cellWidth, cellHeight);
+			}
+
+			if (isDoorway()) {
+				g.setColor(Color.BLUE);
+
+				if (doorDirection == DoorDirection.UP) {
+					g.fillRect(x, y, cellWidth, 4);
+				} else if (doorDirection == DoorDirection.DOWN) {
+					g.fillRect(x, y + cellHeight - 4, cellWidth, 4);
+				} else if (doorDirection == DoorDirection.LEFT) {
+					g.fillRect(x, y, 4, cellHeight);
+				} else if (doorDirection == DoorDirection.RIGHT) {
+					g.fillRect(x + cellWidth - 4, y, 4, cellHeight);
+				}
+			}
+		}
 	
 	
 	
@@ -224,6 +258,14 @@ public class BoardCell {
 
 	public char getInitial() {
 		return initial;
+	}
+	
+	public int getRow() {
+		return row;
+	}
+
+	public int getCol() {
+		return column;
 	}
 
 }

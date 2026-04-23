@@ -8,37 +8,27 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.stream.IntStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
-import experiment.TestBoardCell;
-
 public class Board {
-	//----------------------------------------Variables--------------------------------
 	private static Board theInstance = new Board();
 	private Map<Character, Room> roomMapChar;
 
-	
-	//These contain the cards and use strings to access
 	private Map<String, Card> roomMap;
 	private Map<String, Card> weaponMap;
 	private Map<String, Player> playerMap;
 	private Map<String, Card> cardMap;
-	
-	//files
+
 	private String layoutConfigFile;
 	private String setupConfigFile;
 
-	//board cells and board data
 	public BoardCell[][] grid;
 	private Set<BoardCell> targets;
 	private Set<BoardCell> visited;
 	public static int ROWS;
 	public static int COLS;
-	
-	//sets to contain all info/data
+
 	private Set<Character> setupSet = new HashSet<Character>();
 	private Set<Character> configSet = new HashSet<Character>();
 	private ArrayList<Player> players = new ArrayList<>();
@@ -47,12 +37,10 @@ public class Board {
 	private Set<String> roomSet = new HashSet<String>();
 	private ArrayList<Card> deck = new ArrayList<Card>();
 	Set<Card> tempSol = new HashSet<>();
-	
-	//answer
+
 	private Solution theAnswer;
 
-
-	private  Board() {
+	private Board() {
 		roomMapChar = new HashMap<>();
 		roomMap = new HashMap<>();
 		weaponMap = new HashMap<>();
@@ -60,30 +48,28 @@ public class Board {
 		cardMap = new HashMap<>();
 	}
 
-	public void initialize(){
-	    roomMapChar.clear();
-	    roomMap.clear();
-	    weaponMap.clear();
-	    playerMap.clear();
-	    cardMap.clear();
+	public void initialize() {
+		roomMapChar.clear();
+		roomMap.clear();
+		weaponMap.clear();
+		playerMap.clear();
+		cardMap.clear();
 
-	    setupSet.clear();
-	    configSet.clear();
-	    players.clear();
-	    weaponSet.clear();
-	    roomSet.clear();
-	    deck.clear();
-	    
-	    targets = new HashSet<>();
-	    visited = new HashSet<>();
+		setupSet.clear();
+		configSet.clear();
+		players.clear();
+		weaponSet.clear();
+		roomSet.clear();
+		deck.clear();
 
-	    loadSetupConfig();
-	    loadLayoutConfig();
+		targets = new HashSet<>();
+		visited = new HashSet<>();
+
+		loadSetupConfig();
+		loadLayoutConfig();
 	}
 
-	//---------------------------Load_Config_Files-------------------------------------------
-
-	public void loadSetupConfig(){
+	public void loadSetupConfig() {
 		try (Scanner scanner = new Scanner(new File(setupConfigFile))) {
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine().trim();
@@ -92,37 +78,35 @@ public class Board {
 					continue;
 				}
 
-				// handle players
-				if(line.charAt(0) == 'P') {
+				if (line.charAt(0) == 'P') {
 					String[] parts = line.split(",");
 					String name = parts[1].trim();
 					String color = parts[2].trim();
 					String type = parts[3].trim();
 					int row = Integer.parseInt(parts[4].trim());
 					int col = Integer.parseInt(parts[5].trim());
-					if(type.equals("Human")) {
+
+					if (type.equals("Human")) {
 						Player player = new HumanPlayer(name, color, row, col);
 						players.add(player);
 						playerNameSet.add(name);
 						playerMap.put(name, player);
-					} 
-					if(type.equals("Computer")) {
+					}
+
+					if (type.equals("Computer")) {
 						Player player = new ComputerPlayer(name, color, row, col);
 						players.add(player);
 						playerNameSet.add(name);
 						playerMap.put(name, player);
 					}
-					
-					
-					Card card = new Card(name, CardType.PLAYER);
 
+					Card card = new Card(name, CardType.PLAYER);
 					cardMap.put(name, card);
 					deck.add(card);
-					
+
 					continue;
 				}
-				
-				// weapon handling
+
 				if (line.charAt(0) == 'W') {
 					String[] parts = line.split(",");
 					String weaponName = parts[1].trim();
@@ -136,8 +120,6 @@ public class Board {
 					continue;
 				}
 
-
-				// handle rooms
 				String[] parts = line.split(",");
 				if (parts.length < 3) {
 					throw new BadConfigFormatException("Bad configuration file");
@@ -152,22 +134,18 @@ public class Board {
 				if (type.equals("Room")) {
 					roomMapChar.put(symbol, new Room(name));
 					roomSet.add(name);
-					
+
 					Card card = new Card(name, CardType.ROOM);
-					
 					deck.add(card);
 					cardMap.put(name, card);
 				} else if (type.equals("Space")) {
 					roomMapChar.put(symbol, new Room(name));
 				}
-
 			}
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("could not find file: " + setupConfigFile, e);
 		}
 	}
-
-
 
 	public void loadLayoutConfig() {
 		try (Scanner scanner = new Scanner(new File(layoutConfigFile))) {
@@ -209,9 +187,7 @@ public class Board {
 				String[] parts = line.split(",");
 				for (int col = 0; col < COLS; col++) {
 					String token = parts[col].trim();
-
 					configSet.add(token.charAt(0));
-
 					grid[row][col] = new BoardCell(token, row, col, grid);
 				}
 
@@ -220,12 +196,8 @@ public class Board {
 		} catch (FileNotFoundException e) {
 		}
 
-		//make sure files initialize
-		checkAgainstFiles();	
+		checkAgainstFiles();
 
-		
-		
-		// assign label cells, center cells, and secret passages to rooms
 		for (int r = 0; r < ROWS; r++) {
 			for (int c = 0; c < COLS; c++) {
 				BoardCell currentCell = grid[r][c];
@@ -245,8 +217,6 @@ public class Board {
 			}
 		}
 
-
-		// assign doorways to rooms
 		for (int r = 0; r < ROWS; r++) {
 			for (int c = 0; c < COLS; c++) {
 				BoardCell currentCell = grid[r][c];
@@ -256,14 +226,11 @@ public class Board {
 
 					if (currentCell.getDoorDirection() == DoorDirection.UP) {
 						roomCell = grid[r - 1][c];
-					}
-					else if (currentCell.getDoorDirection() == DoorDirection.DOWN) {
+					} else if (currentCell.getDoorDirection() == DoorDirection.DOWN) {
 						roomCell = grid[r + 1][c];
-					}
-					else if (currentCell.getDoorDirection() == DoorDirection.LEFT) {
+					} else if (currentCell.getDoorDirection() == DoorDirection.LEFT) {
 						roomCell = grid[r][c - 1];
-					}
-					else if (currentCell.getDoorDirection() == DoorDirection.RIGHT) {
+					} else if (currentCell.getDoorDirection() == DoorDirection.RIGHT) {
 						roomCell = grid[r][c + 1];
 					}
 
@@ -271,7 +238,6 @@ public class Board {
 						if (roomCell.getInitial() != 'W' && roomCell.getInitial() != 'X') {
 							Room currentRoom = getRoom(roomCell);
 							currentRoom.addDoorCell(currentCell);
-
 						}
 					}
 				}
@@ -285,15 +251,11 @@ public class Board {
 		}
 	}
 
-
-	//-----------------------Target_functions-------------------------------
-
 	public void calcTargets(BoardCell startCell, int pathlength) {
 		visited = new HashSet<>();
 		targets = new HashSet<>();
 		visited.add(startCell);
 		findAllTargets(startCell, pathlength);
-		//set visited and targets sets, then start recursive func
 	}
 
 	public void findAllTargets(BoardCell cell, int pathlen) {
@@ -310,8 +272,7 @@ public class Board {
 
 			if (pathlen == 1 || adjCell.isRoom()) {
 				targets.add(adjCell);
-			}
-			else {
+			} else {
 				findAllTargets(adjCell, pathlen - 1);
 			}
 
@@ -319,69 +280,54 @@ public class Board {
 		}
 	}
 
-	//-----------------------------File init check function------------------------
-
-
 	public void checkAgainstFiles() {
 		if (!configSet.equals(setupSet)) {
 			throw new BadConfigFormatException("Bad room in setup files");
 		}
 	}
 
-	//-----------------------------Card functions----------------------------------
-	
-	
 	public void deal() {
-	    ArrayList<Card> rooms = new ArrayList<>();
-	    ArrayList<Card> people = new ArrayList<>();
-	    ArrayList<Card> weapons = new ArrayList<>();
-	    ArrayList<Card> remainingCards = new ArrayList<>();
+		ArrayList<Card> rooms = new ArrayList<>();
+		ArrayList<Card> people = new ArrayList<>();
+		ArrayList<Card> weapons = new ArrayList<>();
+		ArrayList<Card> remainingCards = new ArrayList<>();
 
-	    Random rand = new Random();
+		Random rand = new Random();
 
-	    // Separate cards by type
-	    for (Card c : deck) {
-	        if (c.getType() == CardType.ROOM) {
-	            rooms.add(c);
-	        } 
-	        else if (c.getType() == CardType.PLAYER) {
-	            people.add(c);
-	        } 
-	        else if (c.getType() == CardType.WEAPON) {
-	            weapons.add(c);
-	        }
-	    }
+		for (Card c : deck) {
+			if (c.getType() == CardType.ROOM) {
+				rooms.add(c);
+			} else if (c.getType() == CardType.PLAYER) {
+				people.add(c);
+			} else if (c.getType() == CardType.WEAPON) {
+				weapons.add(c);
+			}
+		}
 
-	    // Pick one of each type for the answer
-	    Card roomAnswer = rooms.remove(rand.nextInt(rooms.size()));
-	    Card personAnswer = people.remove(rand.nextInt(people.size()));
-	    Card weaponAnswer = weapons.remove(rand.nextInt(weapons.size()));
+		Card roomAnswer = rooms.remove(rand.nextInt(rooms.size()));
+		Card personAnswer = people.remove(rand.nextInt(people.size()));
+		Card weaponAnswer = weapons.remove(rand.nextInt(weapons.size()));
 
-	    theAnswer = new Solution(roomAnswer, personAnswer, weaponAnswer);
+		theAnswer = new Solution(roomAnswer, personAnswer, weaponAnswer);
 
-	    // Build list of cards to actually deal
-	    remainingCards.addAll(rooms);
-	    remainingCards.addAll(people);
-	    remainingCards.addAll(weapons);
+		remainingCards.addAll(rooms);
+		remainingCards.addAll(people);
+		remainingCards.addAll(weapons);
 
-	    // Shuffle remaining cards
-	    Collections.shuffle(remainingCards);
+		Collections.shuffle(remainingCards);
 
-	    // Clear players' hands first if needed
-	    for (Player p : players) {
-	        p.getHand().clear();
-	    }
+		for (Player p : players) {
+			p.getHand().clear();
+		}
 
-	    // Deal cards round-robin
-	    int playerIndex = 0;
-	    for (Card c : remainingCards) {
-	        players.get(playerIndex).updateHand(c);
-	        playerIndex = (playerIndex + 1) % players.size();
-	    }
+		int playerIndex = 0;
+		for (Card c : remainingCards) {
+			players.get(playerIndex).updateHand(c);
+			playerIndex = (playerIndex + 1) % players.size();
+		}
 	}
-	
+
 	public void setSolution(String player, String weapon, String room) {
-		//currently just sets solution to the first card of each type, need to implement random element
 		theAnswer = new Solution(cardMap.get(player), cardMap.get(weapon), cardMap.get(room));
 	}
 
@@ -389,7 +335,7 @@ public class Board {
 		tempSol.add(p);
 		tempSol.add(w);
 		tempSol.add(r);
-		if(theAnswer.getAnswer().equals(tempSol)) {
+		if (theAnswer.getAnswer().equals(tempSol)) {
 			tempSol.clear();
 			return true;
 		} else {
@@ -397,41 +343,40 @@ public class Board {
 			return false;
 		}
 	}
-	
+
 	public Card handleSuggestion(Card p, Card w, Card r, Player play) {
-		for(Player player : players) {
-			if(player == play) {
+		for (Player player : players) {
+			if (player == play) {
 				continue;
 			}
 			Card c = player.disproveSuggestion(p, w, r);
-			if(c != null) {
+			if (c != null) {
 				return c;
 			}
 		}
 		return null;
 	}
 
-	//------------------------------Getters------------------------------------
-
 	public static Board getInstance() {
 		return theInstance;
 	}
-	public ArrayList<Card> getDeck(){
+
+	public ArrayList<Card> getDeck() {
 		return deck;
 	}
-	
+
 	public Card getCard(String name) {
 		return cardMap.get(name);
 	}
-	
+
 	public Player getPlayer(String name) {
 		return playerMap.get(name);
 	}
-	
+
 	public Solution getAnswer() {
 		return theAnswer;
 	}
-	
+
 	public BoardCell getCell(int row, int column) {
 		return grid[row][column];
 	}
@@ -439,9 +384,11 @@ public class Board {
 	public int getNumRows() {
 		return ROWS;
 	}
+
 	public int getNumColumns() {
 		return COLS;
 	}
+
 	public Room getRoom(char c) {
 		return roomMapChar.get(c);
 	}
@@ -455,28 +402,31 @@ public class Board {
 		this.setupConfigFile = setupFile;
 	}
 
-	public Set<BoardCell> getTargets(){
+	public Set<BoardCell> getTargets() {
 		return targets;
 	}
 
 	public Map<String, Card> getRoomMap() {
 		return roomMap;
 	}
-	
+
 	public Map<String, Player> getPlayerMap() {
 		return playerMap;
 	}
-	
+
 	public Map<String, Card> getWeaponMap() {
 		return weaponMap;
 	}
 
-	public Map<Character, Room> getRoomMapChar(){
+	public Map<Character, Room> getRoomMapChar() {
 		return roomMapChar;
 	}
-	
+
 	public void setRoomMap(Map<String, Card> roomMap) {
 		this.roomMap = roomMap;
 	}
 
+	public ArrayList<Player> getPlayers() {
+		return players;
+	}
 }
