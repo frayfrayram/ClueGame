@@ -132,7 +132,7 @@ public class ComputerAITest {
 		Set<BoardCell> observed = new HashSet<>();
 
 		// 1. If room in target list has not been seen, select it
-		board.calcTargets(board.getCell(2, 2), 2);
+		board.calcTargets(board.getCell(2, 2), 3);
 		selected = cpu.selectTarget();
 
 		assertTrue(board.getTargets().contains(selected));

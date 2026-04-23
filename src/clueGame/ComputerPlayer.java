@@ -42,32 +42,31 @@ public class ComputerPlayer extends Player {
 	}
 
 	public BoardCell selectTarget() {
-		Board board = Board.getInstance();
-		Map<Character, Room> roomMap = board.getRoomMapChar();
-		//currently no function for roll, so set value at 2
-		
+	    Board board = Board.getInstance();
+	    Set<BoardCell> targets = board.getTargets();
 
-		// NEED TO CHANGE THIS WITH A GETROLL() 
-		board.calcTargets(board.getCell(getRow(), getCol()), 1);
-		Set<BoardCell> targets = board.getTargets();
-		
-		for(BoardCell t : targets) {
-			if(!seen.contains(Board.getInstance().getCard(roomMap.get(t.getInitial()).getName()))) {
-				return t;
-			}		
-		}
-		
-		int size = targets.size();
-		int item = new Random().nextInt(size); 
-		int i = 0;
-		for(BoardCell obj : targets)
-		{
-		    if (i == item)
-		        return obj;
-		    i++;
-		}
-		
-		return null;
+	    // Prefer an unseen room
+	    for (BoardCell t : targets) {
+	        if (t.isRoom()) {
+	            Room room = board.getRoom(t);
+	            Card roomCard = board.getCard(room.getName());
+	            if (!seen.contains(roomCard)) {
+	                return t;
+	            }
+	        }
+	    }
+
+	    // Otherwise pick a random target
+	    int item = new Random().nextInt(targets.size());
+	    int i = 0;
+	    for (BoardCell cell : targets) {
+	        if (i == item) {
+	            return cell;
+	        }
+	        i++;
+	    }
+
+	    return null;
 	}
 }
 

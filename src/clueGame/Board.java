@@ -8,10 +8,19 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
+
+import javax.swing.JOptionPane;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class Board {
+	
+	private int currentPlayerIndex = 0;
+	private int dieRoll = 0;
+	private boolean humanTurnFinished = true;
+	private boolean awaitingHumanMove = false;
+	
 	private static Board theInstance = new Board();
 	private Map<Character, Room> roomMapChar;
 
@@ -132,12 +141,13 @@ public class Board {
 				setupSet.add(symbol);
 
 				if (type.equals("Room")) {
-					roomMapChar.put(symbol, new Room(name));
-					roomSet.add(name);
+				    roomMapChar.put(symbol, new Room(name));
+				    roomSet.add(name);
 
-					Card card = new Card(name, CardType.ROOM);
-					deck.add(card);
-					cardMap.put(name, card);
+				    Card card = new Card(name, CardType.ROOM);
+				    deck.add(card);
+				    cardMap.put(name, card);
+				    roomMap.put(name, card);
 				} else if (type.equals("Space")) {
 					roomMapChar.put(symbol, new Room(name));
 				}
@@ -241,7 +251,7 @@ public class Board {
 						}
 					}
 				}
-			}
+			}			
 		}
 
 		for (int r = 0; r < ROWS; r++) {
@@ -280,12 +290,25 @@ public class Board {
 		}
 	}
 
+	//--------------------------------init funcs---------------------------
+	
 	public void checkAgainstFiles() {
 		if (!configSet.equals(setupSet)) {
 			throw new BadConfigFormatException("Bad room in setup files");
 		}
 	}
+	
+	public void splashScreen() {
+		JOptionPane.showMessageDialog(
+			    null,
+			    "You are Franklin.\nCan you find the solution before your evil ass roomates?",
+			    "Welcome to Clue (GOON HOUSE VERSION)",
+			    JOptionPane.INFORMATION_MESSAGE
+			);
+	}
 
+	//--------------------------------card functions---------------------------
+	
 	public void deal() {
 		ArrayList<Card> rooms = new ArrayList<>();
 		ArrayList<Card> people = new ArrayList<>();
@@ -332,31 +355,72 @@ public class Board {
 	}
 
 	public boolean checkAccusation(Card p, Card w, Card r) {
-		tempSol.add(p);
-		tempSol.add(w);
-		tempSol.add(r);
-		if (theAnswer.getAnswer().equals(tempSol)) {
-			tempSol.clear();
-			return true;
-		} else {
-			tempSol.clear();
-			return false;
-		}
+	    return theAnswer.getPerson().equals(p)
+	        && theAnswer.getWeapon().equals(w)
+	        && theAnswer.getRoom().equals(r);
 	}
 
-	public Card handleSuggestion(Card p, Card w, Card r, Player play) {
-		for (Player player : players) {
-			if (player == play) {
-				continue;
-			}
-			Card c = player.disproveSuggestion(p, w, r);
-			if (c != null) {
-				return c;
-			}
-		}
-		return null;
-	}
+	public Card handleSuggestion(Card p, Card w, Card r, Player accuser) {
+	    int startIndex = players.indexOf(accuser);
 
+	    for (int i = 1; i < players.size(); i++) {
+	        Player current = players.get((startIndex + i) % players.size());
+	        Card disproval = current.disproveSuggestion(p, w, r);
+	        if (disproval != null) {
+	            return disproval;
+	        }
+	    }
+	    return null;
+	}
+	
+	//-----------------------------------turn based functions--------------------------------
+	
+	public void nextPlayerFlow() {
+	    Player current = players.get(currentPlayerIndex);
+
+	    if (current instanceof HumanPlayer && !humanTurnFinished) {
+	        javax.swing.JOptionPane.showMessageDialog(null, "You must finish your turn!");
+	        return;
+	    }
+
+	    currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+	    Player newPlayer = players.get(currentPlayerIndex);
+
+	    dieRoll = new Random().nextInt(6) + 1;
+	    calcTargets(getCell(newPlayer.getRow(), newPlayer.getCol()), dieRoll);
+
+	    if (newPlayer instanceof HumanPlayer) {
+	        awaitingHumanMove = true;
+	        humanTurnFinished = false;
+	    } else {
+	        awaitingHumanMove = false;
+	        BoardCell destination = newPlayer.selectTarget();
+	        newPlayer.setLocation(destination.getRow(), destination.getCol());
+
+	    }
+	}
+	
+	public void handleBoardClick(BoardCell clickedCell) {
+	    Player current = players.get(currentPlayerIndex);
+
+	    if (!(current instanceof HumanPlayer)) {
+	        return;
+	    }
+	    if (!awaitingHumanMove) {
+	        return;
+	    }
+	    if (!targets.contains(clickedCell)) {
+	        JOptionPane.showMessageDialog(null, "Invalid target selected");
+	        return;
+	    }
+	    current.setLocation(clickedCell.getRow(), clickedCell.getCol());
+
+	    awaitingHumanMove = false;
+	    humanTurnFinished = true;
+	}
+	
+	//------------------------------getters---------------------------------
+	
 	public static Board getInstance() {
 		return theInstance;
 	}
