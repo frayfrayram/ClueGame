@@ -20,6 +20,9 @@ public class Board {
 	private int dieRoll = 0;
 	private boolean humanTurnFinished = true;
 	private boolean awaitingHumanMove = false;
+	private GameControlPanel controlPanel;
+	private BoardPanel boardPanel;
+	private Random random = new Random();
 	
 	private static Board theInstance = new Board();
 	private Map<Character, Room> roomMapChar;
@@ -67,15 +70,21 @@ public class Board {
 		setupSet.clear();
 		configSet.clear();
 		players.clear();
+		playerNameSet.clear();
 		weaponSet.clear();
 		roomSet.clear();
 		deck.clear();
+		currentPlayerIndex = 0;
+		dieRoll = 0;
+		humanTurnFinished = true;
+		awaitingHumanMove = false;
 
 		targets = new HashSet<>();
 		visited = new HashSet<>();
 
 		loadSetupConfig();
 		loadLayoutConfig();
+		refreshOccupancy();
 	}
 
 	public void loadSetupConfig() {
@@ -261,6 +270,8 @@ public class Board {
 		}
 	}
 
+	//------------------------------cell funcs-----------------------------
+	
 	public void calcTargets(BoardCell startCell, int pathlength) {
 		visited = new HashSet<>();
 		targets = new HashSet<>();
@@ -374,6 +385,22 @@ public class Board {
 	}
 	
 	//-----------------------------------turn based functions--------------------------------
+
+	public void startGame() {
+		if (players.isEmpty()) {
+			return;
+		}
+
+		int humanIndex = getHumanPlayerIndex();
+		if (humanIndex == -1) {
+			currentPlayerIndex = players.size() - 1;
+		}
+		else {
+			currentPlayerIndex = (humanIndex - 1 + players.size()) % players.size();
+		}
+
+		nextPlayerFlow();
+	}
 	
 	public void nextPlayerFlow() {
 	    Player current = players.get(currentPlayerIndex);
@@ -383,21 +410,36 @@ public class Board {
 	        return;
 	    }
 
+	    clearTargetHighlights();
 	    currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
 	    Player newPlayer = players.get(currentPlayerIndex);
 
-	    dieRoll = new Random().nextInt(6) + 1;
+	    dieRoll = random.nextInt(6) + 1;
 	    calcTargets(getCell(newPlayer.getRow(), newPlayer.getCol()), dieRoll);
+	    updateControlPanel(newPlayer);
 
 	    if (newPlayer instanceof HumanPlayer) {
-	        awaitingHumanMove = true;
-	        humanTurnFinished = false;
+	    	if (targets.isEmpty()) {
+	    		awaitingHumanMove = false;
+	    		humanTurnFinished = true;
+	    		JOptionPane.showMessageDialog(null, newPlayer.getName() + " has no valid targets this turn.");
+	    	}
+	    	else {
+	    		awaitingHumanMove = true;
+	    		humanTurnFinished = false;
+	    		setTargetHighlights(true);
+	    	}
 	    } else {
 	        awaitingHumanMove = false;
+	        humanTurnFinished = true;
 	        BoardCell destination = newPlayer.selectTarget();
-	        newPlayer.setLocation(destination.getRow(), destination.getCol());
+	        if (destination != null) {
+	        	movePlayer(newPlayer, destination);
+	        }
 
 	    }
+
+	    refreshBoardPanel();
 	}
 	
 	public void handleBoardClick(BoardCell clickedCell) {
@@ -413,10 +455,74 @@ public class Board {
 	        JOptionPane.showMessageDialog(null, "Invalid target selected");
 	        return;
 	    }
-	    current.setLocation(clickedCell.getRow(), clickedCell.getCol());
+	    movePlayer(current, clickedCell);
+	    clearTargetHighlights();
 
 	    awaitingHumanMove = false;
 	    humanTurnFinished = true;
+	    refreshBoardPanel();
+	}
+
+	private void movePlayer(Player player, BoardCell destination) {
+		player.setLocation(destination.getRow(), destination.getCol());
+		refreshOccupancy();
+	}
+
+	private void refreshOccupancy() {
+		if (grid == null) {
+			return;
+		}
+
+		for (int row = 0; row < ROWS; row++) {
+			for (int col = 0; col < COLS; col++) {
+				grid[row][col].setOccupied(false);
+			}
+		}
+
+		for (Player player : players) {
+			BoardCell playerCell = getCell(player.getRow(), player.getCol());
+			if (!playerCell.isRoom()) {
+				playerCell.setOccupied(true);
+			}
+		}
+	}
+
+	private void setTargetHighlights(boolean highlighted) {
+		for (BoardCell target : targets) {
+			target.setHighlighted(highlighted);
+		}
+	}
+
+	private void clearTargetHighlights() {
+		if (targets == null) {
+			return;
+		}
+		setTargetHighlights(false);
+	}
+
+	private void updateControlPanel(Player currentPlayer) {
+		if (controlPanel == null) {
+			return;
+		}
+
+		controlPanel.setTurn(currentPlayer.getName());
+		controlPanel.setRoll(dieRoll);
+	}
+
+	private void refreshBoardPanel() {
+		if (boardPanel != null) {
+			boardPanel.repaint();
+		}
+	}
+
+	private int getHumanPlayerIndex() {
+		for (int i = 0; i < players.size(); i++) {
+			if (players.get(i) instanceof HumanPlayer) {
+				return i;
+			}
+		}
+
+		return -1;
 	}
 	
 	//------------------------------getters---------------------------------
@@ -492,5 +598,37 @@ public class Board {
 
 	public ArrayList<Player> getPlayers() {
 		return players;
+	}
+
+	public Player getCurrentPlayer() {
+		return players.get(currentPlayerIndex);
+	}
+
+	public int getDieRoll() {
+		return dieRoll;
+	}
+
+	public boolean isAwaitingHumanMove() {
+		return awaitingHumanMove;
+	}
+
+	public void setControlPanel(GameControlPanel controlPanel) {
+		this.controlPanel = controlPanel;
+	}
+
+	public void setBoardPanel(BoardPanel boardPanel) {
+		this.boardPanel = boardPanel;
+	}
+
+	public ArrayList<Player> getPlayersAt(int row, int col) {
+		ArrayList<Player> playersAtLocation = new ArrayList<>();
+
+		for (Player player : players) {
+			if (player.getRow() == row && player.getCol() == col) {
+				playersAtLocation.add(player);
+			}
+		}
+
+		return playersAtLocation;
 	}
 }

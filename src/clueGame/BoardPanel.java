@@ -1,13 +1,45 @@
 package clueGame;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
 public class BoardPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
+
+	public BoardPanel() {
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Board board = Board.getInstance();
+				int cols = board.getNumColumns();
+				int rows = board.getNumRows();
+
+				if (cols == 0 || rows == 0) {
+					return;
+				}
+
+				int cellWidth = getWidth() / cols;
+				int cellHeight = getHeight() / rows;
+
+				if (cellWidth == 0 || cellHeight == 0) {
+					return;
+				}
+
+				int col = e.getX() / cellWidth;
+				int row = e.getY() / cellHeight;
+
+				if (row < 0 || row >= rows || col < 0 || col >= cols) {
+					return;
+				}
+
+				board.handleBoardClick(board.getCell(row, col));
+			}
+		});
+	}
 
 	@Override
 	protected void paintComponent(Graphics g) {

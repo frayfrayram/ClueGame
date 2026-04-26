@@ -3,6 +3,7 @@ package clueGame;
 import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 public class ClueGame extends JFrame {
 	public ClueGame() {
@@ -16,11 +17,21 @@ public class ClueGame extends JFrame {
 		board.initialize();
 		board.deal();
 
-		add(new BoardPanel(), BorderLayout.CENTER);
-		add(new GameControlPanel(), BorderLayout.SOUTH);
+		BoardPanel boardPanel = new BoardPanel();
+		GameControlPanel controlPanel = new GameControlPanel();
+		board.setBoardPanel(boardPanel);
+		board.setControlPanel(controlPanel);
+
+		add(boardPanel, BorderLayout.CENTER);
+		add(controlPanel, BorderLayout.SOUTH);
 		add(new CardPanel(), BorderLayout.EAST);
 
 		setVisible(true);
+
+		SwingUtilities.invokeLater(() -> {
+			board.splashScreen();
+			board.startGame();
+		});
 	}
 
 	public static void main(String[] args) {

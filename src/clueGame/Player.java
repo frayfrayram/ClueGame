@@ -64,12 +64,27 @@ public abstract class Player {
 	public void draw(Graphics g, int cellWidth, int cellHeight) {
 		int x = col * cellWidth;
 		int y = row * cellHeight;
+		Board board = Board.getInstance();
+		List<Player> playersAtLocation = board.getPlayersAt(row, col);
+		int playerIndex = playersAtLocation.indexOf(this);
 
 		Color drawColor = PlayerColors.fromString(color).getColor();
 		g.setColor(drawColor);
-		g.fillOval(x + 2, y + 2, cellWidth - 4, cellHeight - 4);
+		if (playersAtLocation.size() <= 1) {
+			g.fillOval(x + 2, y + 2, cellWidth - 4, cellHeight - 4);
+			g.setColor(Color.BLACK);
+			g.drawOval(x + 2, y + 2, cellWidth - 4, cellHeight - 4);
+			return;
+		}
+
+		int slotWidth = Math.max(8, (cellWidth - 4) / 2);
+		int slotHeight = Math.max(8, (cellHeight - 4) / 3);
+		int diameter = Math.max(6, Math.min(slotWidth, slotHeight) - 2);
+		int drawX = x + 2 + (playerIndex % 2) * slotWidth;
+		int drawY = y + 2 + (playerIndex / 2) * slotHeight;
+		g.fillOval(drawX, drawY, diameter, diameter);
 		g.setColor(Color.BLACK);
-		g.drawOval(x + 2, y + 2, cellWidth - 4, cellHeight - 4);
+		g.drawOval(drawX, drawY, diameter, diameter);
 	}
 
 	public ArrayList<Card> getHand() {
