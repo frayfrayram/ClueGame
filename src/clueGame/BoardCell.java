@@ -2,13 +2,8 @@ package clueGame;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Set;
-
-import experiment.TestBoardCell;
 
 public class BoardCell {
 	//---------------------------private_variables-------------------------------------------
@@ -21,6 +16,7 @@ public class BoardCell {
 	private boolean isRoom, isOccupied ;
 	private int row;
 	private int column;
+	private boolean highlighted;
 
 
 
@@ -186,7 +182,7 @@ public class BoardCell {
 			int y = row * cellHeight;
 
 			if (initial == 'W') {
-				g.setColor(Color.YELLOW);
+				g.setColor(highlighted ? Color.CYAN : Color.YELLOW);
 				g.fillRect(x, y, cellWidth, cellHeight);
 				g.setColor(Color.BLACK);
 				g.drawRect(x, y, cellWidth, cellHeight);
@@ -194,7 +190,7 @@ public class BoardCell {
 				g.setColor(Color.BLACK);
 				g.fillRect(x, y, cellWidth, cellHeight);
 			} else {
-				g.setColor(Color.LIGHT_GRAY);
+				g.setColor(highlighted ? Color.CYAN : Color.LIGHT_GRAY);
 				g.fillRect(x, y, cellWidth, cellHeight);
 			}
 
@@ -237,11 +233,19 @@ public class BoardCell {
 	public void setOccupied(boolean occupied) {
 		isOccupied = occupied;
 	}
+
+	public void setHighlighted(boolean highlighted) {
+		this.highlighted = highlighted;
+	}
 	
 	//----------------- getters --------------------------
 	
 	public boolean getOccupied() {
 		return isOccupied;
+	}
+
+	public boolean isHighlighted() {
+		return highlighted;
 	}
 	
 	public Set<BoardCell> getAdjList(){
