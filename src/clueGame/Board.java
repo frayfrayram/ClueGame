@@ -95,18 +95,18 @@ public class Board {
 					int row = Integer.parseInt(parts[4].trim());
 					int col = Integer.parseInt(parts[5].trim());
 
+					Player player = null;
+
 					if (type.equals("Human")) {
-						Player player = new HumanPlayer(name, color, row, col);
-						players.add(player);
-						playerNameSet.add(name);
-						playerMap.put(name, player);
+					    player = new HumanPlayer(name, color, row, col);
+					} else if (type.equals("Computer")) {
+					    player = new ComputerPlayer(name, color, row, col);
 					}
 
-					if (type.equals("Computer")) {
-						Player player = new ComputerPlayer(name, color, row, col);
-						players.add(player);
-						playerNameSet.add(name);
-						playerMap.put(name, player);
+					if (player != null) {
+					    players.add(player);
+					    playerNameSet.add(name);
+					    playerMap.put(name, player);
 					}
 
 					Card card = new Card(name, CardType.PLAYER);
