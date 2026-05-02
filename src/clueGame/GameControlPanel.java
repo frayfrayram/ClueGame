@@ -69,8 +69,7 @@ public class GameControlPanel extends JPanel {
 			
 			//----------------BUTTONS----------------------
 				JButton accusationButton = new JButton("Make Accusation");
-				accusationButton.addActionListener(e -> JOptionPane.showMessageDialog(this,
-						"Accusations will be added in the next assignment."));
+				accusationButton.addActionListener(e -> Board.getInstance().makeAccusation());
 				secondPanel.add(accusationButton);
 				
 				JButton nextButton = new JButton("NEXT!");
@@ -126,6 +125,14 @@ public class GameControlPanel extends JPanel {
 
 	public void setRoll(int roll) {
 		rollText.setText(Integer.toString(roll));
+	}
+
+	public void setGuess(String guess) {
+		guessText.setText(guess);
+	}
+
+	public void setGuessResult(String result) {
+		guessResultText.setText(result);
 	}
 	
 	/**

@@ -1,38 +1,25 @@
 package clueGame;
 
-import javax.swing.JFrame;
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.GridLayout;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.JLabel;
-import javax.swing.JComboBox;
-import javax.swing.JButton;
-
-
-
-import java.awt.Color;
-import java.awt.GridLayout;
-import java.util.ArrayList;
-import java.util.Set;
-
 
 public class SuggestionPanel extends JDialog {
-	
-	String[] people = { "Franlin", "Will", "FOid" };
-	String[] weapons = { "bar", "text", "slime" };
+	private Solution selection;
 
-	
+	private SuggestionPanel(Frame owner, Card roomCard, boolean chooseRoom) {
+		super(owner, chooseRoom ? "Make an Accusation" : "Make a Suggestion", true);
 
-	public SuggestionPanel() {
-		// TODO Auto-generated constructor stub
-		
-		JDialog suggestionDialog = new JDialog();
-		suggestionDialog.setTitle("Make a Suggestion");
-		
-		JPanel suggestionPanel = new JPanel();
-		suggestionPanel.setLayout(new GridLayout(4, 2));
+		Board board = Board.getInstance();
+		JPanel suggestionPanel = new JPanel(new GridLayout(4, 2));
+
 		JTextField roomText = new JTextField("Current room", 12);
 		roomText.setBorder(null);
 		roomText.setEditable(false);
@@ -43,24 +30,29 @@ public class SuggestionPanel extends JDialog {
 		weaponText.setBorder(null);
 		weaponText.setEditable(false);
 
-		
-		//make a getter for the current room and use it to fill this field. temporarily just text
-		JTextField currentRoom = new JTextField("Lounge", 12);
+		JComboBox<String> roomChoice = new JComboBox<>(board.getSortedRoomNames().toArray(new String[0]));
+		JTextField currentRoom = new JTextField(roomCard == null ? "" : roomCard.getName(), 12);
 		currentRoom.setEditable(false);
-		JComboBox<String> personChoice = new JComboBox<>(people);
-		
-		JComboBox<String> weaponChoice = new JComboBox<>(weapons);
-		
-		
+		JComboBox<String> personChoice = new JComboBox<>(board.getSortedPlayerNames().toArray(new String[0]));
+		JComboBox<String> weaponChoice = new JComboBox<>(board.getSortedWeaponNames().toArray(new String[0]));
+
 		JButton submitButton = new JButton("Submit");
-		
 		JButton cancelButton = new JButton("Cancel");
 
-		
-		
-		
+		submitButton.addActionListener(e -> {
+			Card selectedRoom = chooseRoom
+					? board.getCard((String) roomChoice.getSelectedItem())
+					: roomCard;
+			selection = new Solution(
+					board.getCard((String) personChoice.getSelectedItem()),
+					board.getCard((String) weaponChoice.getSelectedItem()),
+					selectedRoom);
+			dispose();
+		});
+		cancelButton.addActionListener(e -> dispose());
+
 		suggestionPanel.add(roomText);
-		suggestionPanel.add(currentRoom);
+		suggestionPanel.add(chooseRoom ? roomChoice : currentRoom);
 		suggestionPanel.add(personText);
 		suggestionPanel.add(personChoice);
 		suggestionPanel.add(weaponText);
@@ -68,18 +60,31 @@ public class SuggestionPanel extends JDialog {
 		suggestionPanel.add(submitButton);
 		suggestionPanel.add(cancelButton);
 
-		add(suggestionPanel);
-		
-		
-		
-		
-	}
-	
-	public static void main(String[] args) {
-		SuggestionPanel panel = new SuggestionPanel();  // create the panel 
-		panel.setSize(550, 130);  // size the frame
-		panel.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // allow it to close
-		panel.setVisible(true); // make it visible
+		add(suggestionPanel, BorderLayout.CENTER);
+		pack();
+		setLocationRelativeTo(owner);
 	}
 
+	public static Solution showSuggestionDialog(Frame owner, Card roomCard) {
+		SuggestionPanel panel = new SuggestionPanel(owner, roomCard, false);
+		panel.setVisible(true);
+		return panel.selection;
+	}
+
+	public static Solution showAccusationDialog(Frame owner) {
+		SuggestionPanel panel = new SuggestionPanel(owner, null, true);
+		panel.setVisible(true);
+		return panel.selection;
+	}
+
+	public static void main(String[] args) {
+		Board board = Board.getInstance();
+		board.setConfigFiles("data/ClueLayout.csv", "data/ClueSetup.txt");
+		board.initialize();
+		board.deal();
+
+		SuggestionPanel panel = new SuggestionPanel(null, board.getCard("Bar"), false);
+		panel.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		panel.setVisible(true);
+	}
 }

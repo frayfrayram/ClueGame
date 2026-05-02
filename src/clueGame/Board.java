@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 public class Board {
 	
@@ -22,6 +23,7 @@ public class Board {
 	private boolean awaitingHumanMove = false;
 	private GameControlPanel controlPanel;
 	private BoardPanel boardPanel;
+	private CardPanel cardPanel;
 	private Random random = new Random();
 	
 	private static Board theInstance = new Board();
@@ -230,6 +232,10 @@ public class Board {
 						currentRoom.setCenterCell(currentCell);
 					}
 					if (currentCell.getSecretPassage() != ' ') {
+						if (shouldEnforceCustomSecretPassages()
+								&& !isAllowedSecretPassage(currentCell.getInitial(), currentCell.getSecretPassage())) {
+							throw new BadConfigFormatException("Invalid secret passage in layout file");
+						}
 						currentRoom.setSecretPassage(currentCell.getSecretPassage());
 					}
 				}
@@ -359,6 +365,8 @@ public class Board {
 			players.get(playerIndex).updateHand(c);
 			playerIndex = (playerIndex + 1) % players.size();
 		}
+
+		refreshCardPanel();
 	}
 
 	public void setSolution(String player, String weapon, String room) {
@@ -435,6 +443,7 @@ public class Board {
 	        BoardCell destination = newPlayer.selectTarget();
 	        if (destination != null) {
 	        	movePlayer(newPlayer, destination);
+	        	handleRoomEntry(newPlayer, destination);
 	        }
 
 	    }
@@ -460,12 +469,133 @@ public class Board {
 
 	    awaitingHumanMove = false;
 	    humanTurnFinished = true;
+	    handleRoomEntry(current, clickedCell);
 	    refreshBoardPanel();
 	}
 
 	private void movePlayer(Player player, BoardCell destination) {
 		player.setLocation(destination.getRow(), destination.getCol());
 		refreshOccupancy();
+	}
+
+	private void handleRoomEntry(Player player, BoardCell destination) {
+		if (!destination.isRoom()) {
+			return;
+		}
+
+		Room room = getRoom(destination);
+		if (room == null) {
+			return;
+		}
+
+		Card roomCard = getCard(room.getName());
+		if (roomCard == null) {
+			return;
+		}
+
+		if (player instanceof HumanPlayer) {
+			Solution suggestion = SuggestionPanel.showSuggestionDialog(null, roomCard);
+			if (suggestion != null) {
+				processSuggestion(player, suggestion);
+			}
+		} else if (player instanceof ComputerPlayer) {
+			Solution suggestion = ((ComputerPlayer) player).createSuggestion(roomCard);
+			processSuggestion(player, suggestion);
+		}
+	}
+
+	private void processSuggestion(Player accuser, Solution suggestion) {
+		Card disproval = handleSuggestion(
+				suggestion.getPerson(),
+				suggestion.getWeapon(),
+				suggestion.getRoom(),
+				accuser);
+
+		if (disproval != null) {
+			accuser.updateSeen(disproval);
+		}
+
+		updateGuessDisplay(accuser, suggestion, disproval);
+		refreshBoardPanel();
+		refreshCardPanel();
+	}
+
+	public void makeAccusation() {
+		Player current = players.get(currentPlayerIndex);
+		if (!(current instanceof HumanPlayer)) {
+			JOptionPane.showMessageDialog(null, "Only the human player can make an accusation.");
+			return;
+		}
+
+		Solution accusation = SuggestionPanel.showAccusationDialog(null);
+		if (accusation == null) {
+			return;
+		}
+
+		boolean correct = checkAccusation(
+				accusation.getPerson(),
+				accusation.getWeapon(),
+				accusation.getRoom());
+		updateGuessDisplay(current, accusation, null);
+
+		if (correct) {
+			JOptionPane.showMessageDialog(null, "Correct accusation! You win!");
+			System.exit(0);
+		}
+
+		JOptionPane.showMessageDialog(null, "Incorrect accusation. Game over.");
+		System.exit(0);
+	}
+
+	private void updateGuessDisplay(Player accuser, Solution suggestion, Card disproval) {
+		if (controlPanel == null) {
+			return;
+		}
+
+		controlPanel.setGuess(accuser.getName() + ": "
+				+ suggestion.getPerson().getName() + ", "
+				+ suggestion.getWeapon().getName() + ", "
+				+ suggestion.getRoom().getName());
+
+		if (disproval == null) {
+			controlPanel.setGuessResult("No new clue");
+		} else if (accuser instanceof HumanPlayer) {
+			controlPanel.setGuessResult(disproval.getName());
+		} else {
+			controlPanel.setGuessResult("A card was shown");
+		}
+	}
+
+	private Room getRoomForCard(Card roomCard) {
+		if (roomCard == null) {
+			return null;
+		}
+
+		for (Room room : roomMapChar.values()) {
+			if (room.getName().equals(roomCard.getName())) {
+				return room;
+			}
+		}
+
+		return null;
+	}
+
+	private boolean isAllowedSecretPassage(char fromRoom, char toRoom) {
+		return (fromRoom == 'K' && toRoom == 'A')
+				|| (fromRoom == 'A' && toRoom == 'K')
+				|| (fromRoom == 'B' && toRoom == 'C')
+				|| (fromRoom == 'C' && toRoom == 'B');
+	}
+
+	private boolean shouldEnforceCustomSecretPassages() {
+		return roomMapChar.containsKey('K')
+				&& "Kevin Room".equals(roomMapChar.get('K').getName())
+				&& roomMapChar.containsKey('A')
+				&& "Avi Room".equals(roomMapChar.get('A').getName())
+				&& roomMapChar.containsKey('B')
+				&& "Bar".equals(roomMapChar.get('B').getName())
+				&& roomMapChar.containsKey('C')
+				&& "Cooking Room".equals(roomMapChar.get('C').getName());
 	}
 
 	private void refreshOccupancy() {
@@ -512,6 +642,12 @@ public class Board {
 	private void refreshBoardPanel() {
 		if (boardPanel != null) {
 			boardPanel.repaint();
+		}
+	}
+
+	private void refreshCardPanel() {
+		if (cardPanel != null) {
+			cardPanel.refresh();
 		}
 	}
 
@@ -618,6 +754,29 @@ public class Board {
 
 	public void setBoardPanel(BoardPanel boardPanel) {
 		this.boardPanel = boardPanel;
+	}
+
+	public void setCardPanel(CardPanel cardPanel) {
+		this.cardPanel = cardPanel;
+		refreshCardPanel();
+	}
+
+	public ArrayList<String> getSortedPlayerNames() {
+		ArrayList<String> names = new ArrayList<>(playerMap.keySet());
+		Collections.sort(names);
+		return names;
+	}
+
+	public ArrayList<String> getSortedWeaponNames() {
+		ArrayList<String> names = new ArrayList<>(weaponMap.keySet());
+		Collections.sort(names);
+		return names;
+	}
+
+	public ArrayList<String> getSortedRoomNames() {
+		ArrayList<String> names = new ArrayList<>(roomMap.keySet());
+		names.sort(Comparator.naturalOrder());
+		return names;
 	}
 
 	public ArrayList<Player> getPlayersAt(int row, int col) {

@@ -1,6 +1,5 @@
 package clueGame;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
@@ -14,14 +13,6 @@ import java.util.Set;
 
 public class CardPanel extends JPanel {
 	
-	private int numSeenRoomCards;
-	private int numSeenWeaponCards;
-	private int numSeenPlayerCards;
-	
-	private int numHandRoomCards;
-	private int numHandWeaponCards;
-	private int numHandPlayerCards;
-	
 	private Color getCardHolderColor(Board board, Card card) {
 		for (Player p : board.getPlayerMap().values()) {
 			if (p.getHand().contains(card)) {
@@ -33,12 +24,30 @@ public class CardPanel extends JPanel {
 	
 	
 	public CardPanel() {
+		refresh();
+	}
+
+	public void refresh() {
+		removeAll();
+
 		Board board = Board.getInstance();
 		
 		Player player1 = board.getPlayer("Franklin");
+		if (player1 == null) {
+			revalidate();
+			repaint();
+			return;
+		}
 		
 		Set<Card> seen = player1.getSeen();
 		ArrayList<Card> hand = player1.getHand();
+
+		int numSeenRoomCards = 0;
+		int numSeenWeaponCards = 0;
+		int numSeenPlayerCards = 0;
+		int numHandRoomCards = 0;
+		int numHandWeaponCards = 0;
+		int numHandPlayerCards = 0;
 
 		for (Card card : hand) {
 			if (card.getType() == CardType.ROOM) {
@@ -230,6 +239,8 @@ public class CardPanel extends JPanel {
 		cardPanel.add(weaponPanel);
 
 		add(cardPanel);
+		revalidate();
+		repaint();
 	}
 	
 	
@@ -237,6 +248,7 @@ public class CardPanel extends JPanel {
 		Board board = Board.getInstance();
 		board.setConfigFiles("data/ClueLayout.csv", "data/ClueSetup.txt");
 		board.initialize();
+		board.deal();
 
 		Player franklin = board.getPlayer("Franklin");
 		Player avi = board.getPlayer("Avi");
@@ -265,10 +277,10 @@ public class CardPanel extends JPanel {
 		}
 
 		CardPanel panel = new CardPanel();
-		JFrame frame = new JFrame();
+		javax.swing.JFrame frame = new javax.swing.JFrame();
 		frame.setContentPane(panel);
 		frame.setSize(400, 550);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
 }
